@@ -186,7 +186,18 @@ static header * allocate_chunk(size_t size) {
  * @return A block satisfying the user's request
  */
 static inline header * allocate_object(size_t raw_size) {
+
   // TODO implement allocation
+
+  if (raw_size == 0) {
+        return NULL;
+  }
+  size_t actual_size = ALIGN(raw_size + sizeof(header));
+
+  /* search for correct free_list block */  
+
+  
+
   (void) raw_size;
   assert(false);
   exit(1);
