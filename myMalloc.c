@@ -209,7 +209,7 @@ static inline header * allocate_object(size_t raw_size) {
   if (free_list_index < N_LISTS - 1) {
     header *block = freelistSentinels[free_list_index].next;
     block -> size_state |= ALLOCATED;
-    return block -> data;
+    return (void *) block -> data;
   }
   else { 
     header *sentinel = &freelistSentinels[N_LISTS - 1];
@@ -239,7 +239,7 @@ static inline header * allocate_object(size_t raw_size) {
         }
         current->size_state = actual_size;
         current->size_state |= ALLOCATED;
-        return current -> data;
+        return (void *) current -> data;
       }
       current = current->next;
     }
