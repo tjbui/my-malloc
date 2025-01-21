@@ -11,6 +11,7 @@
 #include "myMalloc.h"
 
 #define MALLOC_COLOR "MALLOC_DEBUG_COLOR"
+#define ALIGN(size) (((size) + 7) & ~7)
 
 static bool check_env;
 static bool use_color;
