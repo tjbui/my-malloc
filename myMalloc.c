@@ -179,29 +179,74 @@ static header * allocate_chunk(size_t size) {
   return hdr;
 }
 
-/**
+/** TODO
  * @brief Helper allocate an object given a raw request size from the user
  *
  * @param raw_size number of bytes the user needs
  *
  * @return A block satisfying the user's request
  */
+
 static inline header * allocate_object(size_t raw_size) {
-
-  // TODO implement allocation
-
   if (raw_size == 0) {
         return NULL;
   }
   size_t actual_size = ALIGN(raw_size + sizeof(header));
+  int free_list_index = (actual_size / 8) - 1;
 
-  /* search for correct free_list block */  
-
+  /* iterate through free_lists until reach non empty OR last list*/
   
+  while ((freelistSentinels[free_list_index].next == &freelistSentinels[free_list_index])
+          && (free_list_index < (N_LISTS - 1))) {
+    free_list_index++;
+  }
+ 
+ 
+  /* If free_list_index isn't the last index, set the block to allocated and
+     return the block's data pointer. If it is the last index, traverse the last
+     linked list if gets to that index */
 
-  (void) raw_size;
-  assert(false);
-  exit(1);
+  if (free_list_index < N_LISTS - 1) {
+    header *block = freelistSentinels[free_list_index].next;
+    block -> size_state |= ALLOCATED;
+    return block -> data;
+  }
+  else { 
+    header *sentinel = &freelistSentinels[N_LISTS - 1];
+    header *current = sentinel->next;
+    while (current != sentinel) {
+      if (current -> size_state >= actual_size) {
+        
+        /* Split if necessary. Update size and left size fields of 
+           neighboring block. Update allocation state of allcoated 
+           block to ALLOCATED. Return data pointer */
+        
+        if (current -> size_state > actual_size + sizeof(header)) {
+          header *remaining_block = (header *)((char *)current + actual_size);
+          remaining_block -> size_state = current -> size_state - actual_size;
+          remaining_block->size_state = UNALLOCATED;
+          int new_free_list_index = (remaining_block->size / 8) - 1;
+
+          /* insert split block back into freelist list*/        
+
+          header *sentinel = &freelistSentinels[free_list_index];
+          remaining_block->next = sentinel->next;
+          remaining_block->prev = sentinel;
+          if (sentinel->next != sentinel) {
+            sentinel->next->prev = remaining_block;
+          }
+          sentinel->next = remaining_block;
+        }
+        current->size_state = actual_size;
+        current->size_state |= ALLOCATED;
+        return current -> data;
+      }
+      current = current->next;
+    }
+  }
+
+  /* Task 3: Managing Additional Chunks (no available blocks satsify allocation request */
+
 }
 
 /**
