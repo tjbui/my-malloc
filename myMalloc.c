@@ -229,20 +229,31 @@ static inline header * allocate_object(size_t raw_size) {
            block to ALLOCATED. Return data pointer */
         
         if (current -> size_state > actual_size + sizeof(header)) {
+
+          header *remaining_block = current;
+          remaining_block -> size_state = current -> size_state - actual_size;
+          remaining_block -> size_state |= UNALLOCATED;
+/*
           header *remaining_block = (header *)( (char *) current + actual_size);
           remaining_block -> size_state = current -> size_state - actual_size;
           remaining_block -> left_size = actual_size;
           remaining_block -> size_state |= UNALLOCATED;
-
+*/
           /* remove allocated block from free list */
 
+          header *allocated_block = (header *) ( (char *) current + 
+                                                 (current -> size_state - actual_size));
+          allocated_block -> size_state = actual_size;
+          allocated_block -> left_size = current -> size_state - actual_size;
+          allocated_block -> size_state |= ALLOCATED;
+/*
           if (current -> prev != NULL) {
             current -> prev -> next = current -> next;
           }
           if (current -> next != NULL) {
             current -> next -> prev = current -> prev;
           }
-
+*/
           /* insert split block into appropriate linked list*/        
 
           int new_free_list_index = (remaining_block -> size_state / 8) - 1;
@@ -262,9 +273,9 @@ static inline header * allocate_object(size_t raw_size) {
           new_sentinel->next = remaining_block;
           new_sentinel -> next = remaining_block;
         }
-        current->size_state = actual_size;
-        current->size_state |= ALLOCATED;
-        return current;
+        //current->size_state = actual_size;
+        //current->size_state |= ALLOCATED;
+        return allocated_block;
       }
       current = current->next;
     }
