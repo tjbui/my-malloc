@@ -235,7 +235,10 @@ static inline header * allocate_object(size_t raw_size) {
 
           /* remove allocated block from free list */
 
-          header *allocated_block = (header *) (char *) (current + get_size(remaining_block));
+          header *allocated_block = (header *) get_right_header(remaining_block);
+
+//(char *) (current + get_size(remaining_block));
+
           allocated_block -> size_state = actual_size;
           allocated_block -> left_size = get_size(remaining_block);
           allocated_block -> size_state |= ALLOCATED;
