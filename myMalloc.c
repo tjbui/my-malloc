@@ -246,16 +246,16 @@ static inline header * allocate_object(size_t raw_size) {
           allocated_block -> size_state = actual_size;
           allocated_block -> left_size = remaining_block -> size_state;
           allocated_block -> size_state |= ALLOCATED;
-/*
+
           if (current -> prev != NULL) {
             current -> prev -> next = current -> next;
           }
           if (current -> next != NULL) {
             current -> next -> prev = current -> prev;
           }
-*/
+
           /* insert split block into appropriate linked list */        
-/*
+
           int new_free_list_index = (remaining_block -> size_state / 8) - 1;
           if (new_free_list_index > N_LISTS - 1) {
             new_free_list_index = N_LISTS - 1;
@@ -272,7 +272,7 @@ static inline header * allocate_object(size_t raw_size) {
           remaining_block->prev = new_sentinel;
           new_sentinel->next = remaining_block;
           new_sentinel -> next = remaining_block;
-*/
+
 
           return allocated_block;
         }
