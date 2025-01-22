@@ -237,11 +237,11 @@ static inline header * allocate_object(size_t raw_size) {
 
           header *allocated_block = (header *) (char *) (current + get_size(remaining_block));
           allocated_block -> size_state = actual_size;
-          allocated_block -> left_size = getsize(remaining_block);
+          allocated_block -> left_size = get_size(remaining_block);
           allocated_block -> size_state |= ALLOCATED;
 
           header *right_block = get_right_header(allocated_block);
-          if (getsize(right_block) != 0) {
+          if (get_size(right_block) != 0) {
             right_block->left_size = actual_size;
           }
 
