@@ -209,7 +209,7 @@ static inline header * allocate_object(size_t raw_size) {
   if (free_list_index < N_LISTS - 1) {
     header *block = freelistSentinels[free_list_index].next;
     block -> size_state |= ALLOCATED;
-    return (void *) block -> data;
+    return block;
   }
   else { 
     header *sentinel = &freelistSentinels[N_LISTS - 1];
@@ -248,7 +248,7 @@ static inline header * allocate_object(size_t raw_size) {
         }
         current->size_state = actual_size;
         current->size_state |= ALLOCATED;
-        return (void *) current -> data;
+        return current;
       }
       current = current->next;
     }
@@ -431,9 +431,16 @@ static void init() {
  */
 void * my_malloc(size_t size) {
   pthread_mutex_lock(&mutex);
-  header * hdr = allocate_object(size); 
+  header * hdr = allocate_object(size);
+
+  /* added line below */
+
+  void * data = hdr -> data; 
+
   pthread_mutex_unlock(&mutex);
-  return hdr;
+    
+  return data;
+  /* return hdr; */
 }
 
 void * my_calloc(size_t nmemb, size_t size) {
