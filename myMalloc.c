@@ -229,7 +229,6 @@ static inline header * allocate_object(size_t raw_size) {
            block to ALLOCATED. Return data pointer */
         
         if (get_size(current) > actual_size + sizeof(header)) {
-
           header *remaining_block = current;
           remaining_block -> size_state = (current -> size_state & ~0x7) - actual_size;
           remaining_block -> size_state |= UNALLOCATED;
