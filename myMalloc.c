@@ -227,10 +227,14 @@ static inline header * allocate_object(size_t raw_size) {
           remaining_block -> left_size = actual_size;
           remaining_block -> size_state |= UNALLOCATED;
           int new_free_list_index = (remaining_block -> size_state / 8) - 1;
+          if (new_free_list_index > N_LISTS - 1) {
+            new_free_list_index = N_LISTS - 1;
+          }
 
           /* insert split block into appropriate linked list*/        
 
           header *new_sentinel = &freelistSentinels[new_free_list_index];
+          
           if (new_sentinel -> next != new_sentinel) {
             new_sentinel -> next -> prev = remaining_block;
           }
