@@ -231,7 +231,7 @@ static inline header * allocate_object(size_t raw_size) {
         if (current -> size_state > actual_size + sizeof(header)) {
 
           header *remaining_block = current;
-          remaining_block -> size_state = current -> size_state - actual_size;
+          remaining_block -> size_state = (current -> size_state & ~0x7) - actual_size;
           remaining_block -> size_state |= UNALLOCATED;
 /*
           header *remaining_block = (header *)( (char *) current + actual_size);
@@ -242,20 +242,26 @@ static inline header * allocate_object(size_t raw_size) {
           /* remove allocated block from free list */
 
           header *allocated_block = (header *) ( (char *) current + 
-                                                 (current -> size_state - actual_size));
+                                                 (remaining_block -> size_state & ~0x7));
           allocated_block -> size_state = actual_size;
-          allocated_block -> left_size = remaining_block -> size_state;
+          allocated_block -> left_size = remaining_block -> size_state & ~0x7;
           allocated_block -> size_state |= ALLOCATED;
 
+          header *right_block = get_right_header(allocated_block);
+          if ((right_block->size_state & ~0x7) != 0) {
+            right_block->left_size = actual_size;
+          }
+
+/*
           if (current -> prev != NULL) {
             current -> prev -> next = current -> next;
           }
           if (current -> next != NULL) {
             current -> next -> prev = current -> prev;
           }
-
+*/
           /* insert split block into appropriate linked list */        
-
+/*
           int new_free_list_index = (remaining_block -> size_state / 8) - 1;
           if (new_free_list_index > N_LISTS - 1) {
             new_free_list_index = N_LISTS - 1;
@@ -272,7 +278,7 @@ static inline header * allocate_object(size_t raw_size) {
           remaining_block->prev = new_sentinel;
           new_sentinel->next = remaining_block;
           new_sentinel -> next = remaining_block;
-
+*/
 
           return allocated_block;
         }
