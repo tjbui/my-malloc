@@ -244,7 +244,7 @@ static inline header * allocate_object(size_t raw_size) {
           header *allocated_block = (header *) ( (char *) current + 
                                                  (current -> size_state - actual_size));
           allocated_block -> size_state = actual_size;
-          allocated_block -> left_size = current -> size_state - actual_size;
+          allocated_block -> left_size = remaining_block -> size_state;
           allocated_block -> size_state |= ALLOCATED;
 /*
           if (current -> prev != NULL) {
@@ -278,7 +278,7 @@ static inline header * allocate_object(size_t raw_size) {
         }
         //current->size_state = actual_size;
         //current->size_state |= ALLOCATED;
-        return current;
+        //return current;
       }
       current = current->next;
     }
