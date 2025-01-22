@@ -222,23 +222,18 @@ static inline header * allocate_object(size_t raw_size) {
     header *sentinel = &freelistSentinels[N_LISTS - 1];
     header *current = sentinel->next;
     while (current != sentinel) {
-      if (current -> size_state >= actual_size) {
+      if (get_size(current) >= actual_size) {
         
         /* Split if necessary. Update size and left size fields of 
            neighboring block. Update allocation state of allcoated 
            block to ALLOCATED. Return data pointer */
         
-        if (current -> size_state > actual_size + sizeof(header)) {
+        if (get_size(current) > actual_size + sizeof(header)) {
 
           header *remaining_block = current;
           remaining_block -> size_state = (current -> size_state & ~0x7) - actual_size;
           remaining_block -> size_state |= UNALLOCATED;
-/*
-          header *remaining_block = (header *)( (char *) current + actual_size);
-          remaining_block -> size_state = current -> size_state - actual_size;
-          remaining_block -> left_size = actual_size;
-          remaining_block -> size_state |= UNALLOCATED;
-*/
+
           /* remove allocated block from free list */
 
           header *allocated_block = (header *) ( (char *) current + 
