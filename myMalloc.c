@@ -224,7 +224,8 @@ static inline header * allocate_object(size_t raw_size) {
         if (current -> size_state > actual_size + sizeof(header)) {
           header *remaining_block = (header *)((char *)current + actual_size);
           remaining_block -> size_state = current -> size_state - actual_size;
-          remaining_block->size_state = UNALLOCATED;
+          remaining_block -> left_size = actual_size;
+          remaining_block -> size_state |= UNALLOCATED;
           int new_free_list_index = (remaining_block -> size_state / 8) - 1;
 
           /* insert split block back into freelist list*/        
