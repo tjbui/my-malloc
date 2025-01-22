@@ -229,7 +229,7 @@ static inline header * allocate_object(size_t raw_size) {
            block to ALLOCATED. Return data pointer */
         
         if (current -> size_state > actual_size + sizeof(header)) {
-          header *remaining_block = (header *)((char *)current + actual_size);
+          header *remaining_block = (header *)( (char *) current);
           remaining_block -> size_state = current -> size_state - actual_size;
           remaining_block -> left_size = actual_size;
           remaining_block -> size_state |= UNALLOCATED;
@@ -263,6 +263,7 @@ static inline header * allocate_object(size_t raw_size) {
           new_sentinel -> next = remaining_block;
 
         }
+        current += remaining_block -> size_state;
         current->size_state = actual_size;
         current->size_state |= ALLOCATED;
         return current;
