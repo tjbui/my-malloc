@@ -191,7 +191,14 @@ static inline header * allocate_object(size_t raw_size) {
   if (raw_size == 0) {
         return NULL;
   }
-  size_t actual_size = ALIGN(raw_size + sizeof(header));
+
+  /* calculate actual size and corresponding index */
+
+  size_t aligned_raw_size = ALIGN(raw_size);
+  size_t actual_size = aligned_raw_size = 16;
+  if (actual_size < sizeof(header)) {
+    acutal_size = sizeof(header);
+  }
   int free_list_index = (actual_size / 8) - 1;
 
   /* iterate through free_lists until reach non empty OR last list*/
