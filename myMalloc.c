@@ -197,7 +197,7 @@ static inline header * allocate_object(size_t raw_size) {
   size_t aligned_raw_size = ALIGN(raw_size);
   size_t actual_size = aligned_raw_size = 16;
   if (actual_size < sizeof(header)) {
-    acutual_size = sizeof(header);
+    actual_size = sizeof(header);
   }
   int free_list_index = (actual_size / 8) - 1;
 
