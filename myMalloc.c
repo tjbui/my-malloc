@@ -242,7 +242,7 @@ static inline header * allocate_object(size_t raw_size) {
 
           header *right_block = get_right_header(allocated_block);
           if (get_size(right_block) != 0) {
-            right_block->left_size = get_size(allocated_block;//)actual_size;
+            right_block->left_size = get_size(allocated_block);//)actual_size;
           }
 
 /*
