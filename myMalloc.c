@@ -262,8 +262,8 @@ static inline header * allocate_object(size_t raw_size) {
           new_sentinel->next = remaining_block;
           new_sentinel -> next = remaining_block;
 
+          current += remaining_block -> size_state;
         }
-        current += remaining_block -> size_state;
         current->size_state = actual_size;
         current->size_state |= ALLOCATED;
         return current;
