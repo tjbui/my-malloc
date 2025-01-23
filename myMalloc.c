@@ -201,6 +201,7 @@ int get_free_list_index(size_t actual_size) {
           && (free_list_index < (N_LISTS - 1))) {
     free_list_index++;
   }
+  return free_list_index;
 }
 
 
