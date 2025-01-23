@@ -215,7 +215,7 @@ static inline header * allocate_object(size_t raw_size) {
 
   if (free_list_index < N_LISTS - 1) {
     header *block = freelistSentinels[free_list_index].next;
-    block -> size_state |= ALLOCATED;
+    set_state(block, ALLOCATED);
     return block;
   }
   else { 
@@ -236,9 +236,6 @@ static inline header * allocate_object(size_t raw_size) {
           /* remove allocated block from free list */
 
           header *allocated_block = (header *) get_right_header(remaining_block);
-
-//(char *) (current + get_size(remaining_block));
-
           allocated_block -> size_state = actual_size;
           allocated_block -> left_size = get_size(remaining_block);
           allocated_block -> size_state |= ALLOCATED;
