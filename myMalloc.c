@@ -276,7 +276,6 @@ static header * split_if_necessary(header * current, size_t actual_size, int fre
           remove_header(current);
           return current;
         }
-
 }
 
 
@@ -301,9 +300,6 @@ static inline header * allocate_object(size_t raw_size) {
 
   if (free_list_index < N_LISTS - 1) {
     header *block = freelistSentinels[free_list_index].next;
-    //set_state(block, ALLOCATED);
-    //remove_header(block);
-    //return block;
     return split_if_necessary(block, actual_size, free_list_index);
   }
   else { 
@@ -354,7 +350,7 @@ static inline header * allocate_object(size_t raw_size) {
                  (2 * ALLOC_HEADER_SIZE) + get_size(new_chunk));
       }
     }
-    else {
+    //else {
 
       /* case 2: not neighbors: just insert into free_list */
 
@@ -363,7 +359,7 @@ static inline header * allocate_object(size_t raw_size) {
         new_free_list_index = N_LISTS - 1;
       }
       insert_header(new_chunk, new_free_list_index);
-    }
+    //}
 
     /* check if new size is big enough for the request: actual_size */
 
@@ -372,9 +368,8 @@ static inline header * allocate_object(size_t raw_size) {
       if (new_free_list_index > N_LISTS - 1) {
         new_free_list_index = N_LISTS - 1;
       }
-      insert_header(new_chunk, new_free_list_index);
+      //insert_header(new_chunk, new_free_list_index);
       return split_if_necessary(new_chunk, actual_size, new_free_list_index); 
-      //return new_chunk;
     }
   }
 }
