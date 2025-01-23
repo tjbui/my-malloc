@@ -192,7 +192,7 @@ static size_t calculate_actual_size(size_t raw_size) {
 
 /* helper function get free_list_index given actual_size */
 
-int get_free_list_index(size_t actual_size) {
+static int get_free_list_index(size_t actual_size) {
   int free_list_index = (actual_size / 8) - 1;
 
   /* iterate through free_lists until reach non empty OR last list*/
@@ -204,7 +204,16 @@ int get_free_list_index(size_t actual_size) {
   return free_list_index;
 }
 
+/* helper function to remove header from list */
 
+static void remove_header(header * block) {
+  if (block -> prev != NULL) {
+    block -> prev -> next = block -> next;
+  }
+  if (block -> next != NULL) {
+    block -> next -> prev = block -> prev;
+  }
+}
 
 /** TODO
  * @brief Helper allocate an object given a raw request size from the user
@@ -223,20 +232,12 @@ static inline header * allocate_object(size_t raw_size) {
  
   /* If free_list_index isn't the last index, set the block to allocated and
      return the block's data pointer. If it is the last index, traverse the last
-     linked list if gets to that index */
+     linked list */
 
   if (free_list_index < N_LISTS - 1) {
     header *block = freelistSentinels[free_list_index].next;
     set_state(block, ALLOCATED);
-
-    /* remove */
-           
-    if (block -> prev != NULL) {
-      block -> prev -> next = block -> next;
-    }
-    if (block -> next != NULL) {
-      block -> next -> prev = block -> prev;
-    }
+    remove_header(block);
     return block;
   }
   else { 
@@ -284,13 +285,13 @@ static inline header * allocate_object(size_t raw_size) {
             /* remove remaining_block from free list and insert into appropriate one */
 
             /* remove */
-            
-            if (current -> prev != NULL) {
-              current -> prev -> next = current -> next;
-            }
-            if (current -> next != NULL) {
-              current -> next -> prev = current -> prev;
-            }
+            remove_header(current);
+            //if (current -> prev != NULL) {
+            //  current -> prev -> next = current -> next;
+            //}
+            //if (current -> next != NULL) {
+            //  current -> next -> prev = current -> prev;
+           // }
 
             /* insert */
 
