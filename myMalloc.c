@@ -232,53 +232,60 @@ static inline header * allocate_object(size_t raw_size) {
         
         if (get_size(current) > actual_size + sizeof(header)) {
 
-          /* update remmaining and allocated blocks */
+          /* update remaining, left, and allocated blocks */
 
           header *remaining_block = current;
           set_size(remaining_block, get_size(current) - actual_size);
-          //remaining_block -> size_state = get_size(current) - actual_size;
           set_state(remaining_block, UNALLOCATED);
-          //remaining_block -> size_state |= UNALLOCATED;
           header *allocated_block = (header *) get_right_header(remaining_block);
           set_size(allocated_block, actual_size);
-          //allocated_block -> size_state = actual_size;
           allocated_block -> left_size = get_size(remaining_block);
           set_state(allocated_block, ALLOCATED);
-          //allocated_block -> size_state |= ALLOCATED;
           header *right_block = get_right_header(allocated_block);
           if (get_size(right_block) != 0) {
             right_block->left_size = get_size(allocated_block);
           }
 
-/*
-          if (current -> prev != NULL) {
-            current -> prev -> next = current -> next;
-          }
-          if (current -> next != NULL) {
-            current -> next -> prev = current -> prev;
-          }
-*/
-          /* insert split block into appropriate linked list */        
-/*
-          int new_free_list_index = (remaining_block -> size_state / 8) - 1;
+          /* remaining_block needs to be placed in correct free list */
+
+          int new_free_list_index = (get_size(remaining_block) / 8) - 1;
           if (new_free_list_index > N_LISTS - 1) {
             new_free_list_index = N_LISTS - 1;
           }
-          header *new_sentinel = &freelistSentinels[new_free_list_index];
-          
-          if (new_sentinel -> next != new_sentinel) {
-            new_sentinel -> next -> prev = remaining_block;
-          }
-          if (new_sentinel -> next == new_sentinel) {
-            new_sentinel -> prev = remaining_block;
-          }
-          remaining_block->next = new_sentinel->next;
-          remaining_block->prev = new_sentinel;
-          new_sentinel->next = remaining_block;
-          new_sentinel -> next = remaining_block;
-*/
+          if (new_free_list_index == free_list_index) {
 
-          return allocated_block;
+            /* remaining_block is already in correct free list */
+
+            return allocated_block;
+          }
+          else {
+
+            /* remove remaining_block from free list and insert into appropriate one */
+
+            /* remove */
+            
+            if (current -> prev != NULL) {
+              current -> prev -> next = current -> next;
+            }
+            if (current -> next != NULL) {
+              current -> next -> prev = current -> prev;
+            }
+
+            /* insert */
+
+            header *new_sentinel = &freelistSentinels[new_free_list_index];
+            if (new_sentinel -> next != new_sentinel) {
+              new_sentinel -> next -> prev = remaining_block;
+            }
+            if (new_sentinel -> next == new_sentinel) {
+              new_sentinel -> prev = remaining_block;
+            }
+            remaining_block->next = new_sentinel->next;
+            remaining_block->prev = new_sentinel;
+            new_sentinel->next = remaining_block;
+            new_sentinel -> next = remaining_block;
+            return allocated_block;
+          }
         }
         else {
               
