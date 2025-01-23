@@ -317,7 +317,7 @@ static inline header * allocate_object(size_t raw_size) {
     if (new_chunk == NULL) {
       return NULL;
     }
-    header * fenceBeforeChunk = (new_chunk - (2 * sizeOf(header)));
+    header * fenceBeforeChunk = (new_chunk - (2 * sizeof(header)));
 
     /* check if lastFencePost is next to new chunk and coalesce if necessary */
 
@@ -348,12 +348,13 @@ static inline header * allocate_object(size_t raw_size) {
 
       /* case 2: not neighbors: just insert into free_list */
 
-      insert_header(new_chunk, ); //needs index
+      int new_free_list_index = (get_size(new_chunk) / 8) - 1;
+      insert_header(new_chunk, new_free_list_index);
     }
 
     /* check if new size is big enough for the request: actual_size */
 
-    if (new_chunk >= actual_size) {
+    if (get_size(new_chunk) >= actual_size) {
       return new_chunk;
       break;
     }
