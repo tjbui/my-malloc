@@ -208,7 +208,6 @@ static inline header * allocate_object(size_t raw_size) {
     free_list_index++;
   }
  
- 
   /* If free_list_index isn't the last index, set the block to allocated and
      return the block's data pointer. If it is the last index, traverse the last
      linked list if gets to that index */
@@ -216,6 +215,15 @@ static inline header * allocate_object(size_t raw_size) {
   if (free_list_index < N_LISTS - 1) {
     header *block = freelistSentinels[free_list_index].next;
     set_state(block, ALLOCATED);
+
+    /* remove */
+           
+    if (block -> prev != NULL) {
+      block -> prev -> next = block -> next;
+    }
+    if (block -> next != NULL) {
+      block -> next -> prev = block -> prev;
+    }
     return block;
   }
   else { 
@@ -282,7 +290,6 @@ static inline header * allocate_object(size_t raw_size) {
             }
             remaining_block->next = new_sentinel->next;
             remaining_block->prev = new_sentinel;
-            new_sentinel->next = remaining_block;
             new_sentinel -> next = remaining_block;
             return allocated_block;
           }
