@@ -196,6 +196,7 @@ static size_t calculate_actual_size(size_t raw_size) {
 /* helper function get free_list_index given actual_size */
 
 static int get_free_list_index(size_t actual_size) {
+  actual_size -= ALLOC_HEADER_SIZE;
   int free_list_index = (actual_size / 8) - 1;
 
   /* iterate through free_lists until reach non empty OR last list*/
@@ -358,7 +359,8 @@ static inline void deallocate_object(void * p) {
       // Case 1: Neither neighbor is unallocated
 
       set_state(current, UNALLOCATED);
-      int free_list_index =  (get_size(current) / 8) - 1;
+      
+      int free_list_index =  ((get_size(current) - ALLOC_HEADER_SIZE) / 8) - 1;
       insert_header(current, free_list_index);
   } else if (right_unallocated && !left_unallocated) {
 
