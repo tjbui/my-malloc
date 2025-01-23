@@ -311,6 +311,7 @@ static inline header * allocate_object(size_t raw_size) {
 
     /* No memory block available. Manage additional chunks*/
 
+    
   }
 
   /* Task 3: Managing Additional Chunks (no available blocks satsify allocation request */
@@ -345,7 +346,7 @@ static inline void deallocate_object(void * p) {
 
   header *current = (header *)((char *) p - sizeof(header));
   if (get_state(current) != ALLOCATED) {
-    current = (header *)((char *) p - 16);
+    current = (header *)((char *) p - (2 * sizeof(size_t));
   }
 
   size_t current_size = get_size(current);
