@@ -371,7 +371,7 @@ static inline void deallocate_object(void * p) {
       set_size(left, new_size);
       header *new_right = get_right_header(left);
       new_right->left_size = new_size;
-      insert_block(left);
+      insert_header(left);
   } else {
 
       // Case 4: Both neighbors are unallocated
@@ -383,7 +383,7 @@ static inline void deallocate_object(void * p) {
       set_size(left, new_size);
       header *new_right = get_right_header(left);
       new_right->left_size = new_size;
-      insert_block(left);
+      insert_header(left);
   }
 }
 
