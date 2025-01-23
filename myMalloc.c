@@ -348,7 +348,8 @@ static inline void deallocate_object(void * p) {
       // Case 1: Neither neighbor is unallocated
 
       set_state(current, UNALLOCATED);
-      insert_header(current);
+      int free_list_index = get_free_list_index(get_size(current));
+      insert_header(current, free_list_index);
   } else if (right_unallocated && !left_unallocated) {
 
       // Case 2: Only the right block is unallocated
@@ -359,7 +360,7 @@ static inline void deallocate_object(void * p) {
       set_size(current, new_size);
       header *new_right = get_right_header(current);
       new_right->left_size = new_size;
-      int free_list_index = get_free_list_index(current);
+      int free_list_index = get_free_list_index(get_size(current));
       insert_header(current, free_list_index);
   } else if (!right_unallocated && left_unallocated) {
 
@@ -371,7 +372,8 @@ static inline void deallocate_object(void * p) {
       set_size(left, new_size);
       header *new_right = get_right_header(left);
       new_right->left_size = new_size;
-      insert_header(left);
+      int free_list_index = get_free_list_index(get_size(left));
+      insert_header(left, free_list_index);
   } else {
 
       // Case 4: Both neighbors are unallocated
@@ -383,7 +385,8 @@ static inline void deallocate_object(void * p) {
       set_size(left, new_size);
       header *new_right = get_right_header(left);
       new_right->left_size = new_size;
-      insert_header(left);
+      int free_list_index = get_free_list_index(get_size(left));
+      insert_header(left, free_list_index);
   }
 }
 
