@@ -229,6 +229,57 @@ static void insert_header(header * remaining_block, int new_free_list_index) {
   new_sentinel -> next = remaining_block;
 }
 
+/* helper function to split */
+
+static header * split_if_necessary(header * current, size_t actual_size) {
+
+        // Split if necessary. Update size and left size fields of 
+        //   neighboring block. Update allocation state of allcoated 
+        //   block to ALLOCATED. Return data pointer 
+        
+        if (get_size(current) > actual_size + sizeof(header)) {
+
+          // update remaining, left, and allocated blocks 
+
+          header *remaining_block = current;
+          set_size(remaining_block, get_size(current) - actual_size);
+          set_state(remaining_block, UNALLOCATED);
+          header *allocated_block = (header *) get_right_header(remaining_block);
+          set_size(allocated_block, actual_size);
+          allocated_block -> left_size = get_size(remaining_block);
+          set_state(allocated_block, ALLOCATED);
+          header *right_block = get_right_header(allocated_block);
+          if (get_size(right_block) != 0) {
+            right_block->left_size = get_size(allocated_block);
+          }
+
+          // remaining_block needs to be placed in correct free list 
+
+          int new_free_list_index = (get_size(remaining_block) / 8) - 1;
+          if (new_free_list_index > N_LISTS - 1) {
+            new_free_list_index = N_LISTS - 1;
+          }
+          if (new_free_list_index == free_list_index) {
+            return allocated_block;
+          }
+          else {
+            remove_header(current);
+            insert_header(remaining_block, new_free_list_index);
+            return allocated_block;
+          }
+        }
+        else {
+              
+          // If block is large enough to fulfill request, but not split 
+
+          set_state(current, ALLOCATED);
+          remove_header(current);
+          return current;
+        }
+
+}
+
+
 /** 
  * @brief Helper allocate an object given a raw request size from the user
  *
@@ -262,13 +313,17 @@ static inline header * allocate_object(size_t raw_size) {
         
         /* Block of sufficient size found */
 
-        /* Split if necessary. Update size and left size fields of 
-           neighboring block. Update allocation state of allcoated 
-           block to ALLOCATED. Return data pointer */
+        return split_if_necessary(current, actual_size);
+
+
+/*
+        // Split if necessary. Update size and left size fields of 
+        //   neighboring block. Update allocation state of allcoated 
+        //   block to ALLOCATED. Return data pointer 
         
         if (get_size(current) > actual_size + sizeof(header)) {
 
-          /* update remaining, left, and allocated blocks */
+          // update remaining, left, and allocated blocks 
 
           header *remaining_block = current;
           set_size(remaining_block, get_size(current) - actual_size);
@@ -282,7 +337,7 @@ static inline header * allocate_object(size_t raw_size) {
             right_block->left_size = get_size(allocated_block);
           }
 
-          /* remaining_block needs to be placed in correct free list */
+          // remaining_block needs to be placed in correct free list 
 
           int new_free_list_index = (get_size(remaining_block) / 8) - 1;
           if (new_free_list_index > N_LISTS - 1) {
@@ -299,12 +354,16 @@ static inline header * allocate_object(size_t raw_size) {
         }
         else {
               
-          /* If block is large enough to fulfill request, but not split */
+          // If block is large enough to fulfill request, but not split 
 
           set_state(current, ALLOCATED);
           remove_header(current);
           return current;
         }
+*/
+
+
+
       }
       current = current->next;
     }
