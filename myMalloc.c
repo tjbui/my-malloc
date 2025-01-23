@@ -372,6 +372,7 @@ static inline header * allocate_object(size_t raw_size) {
       if (new_free_list_index > N_LISTS - 1) {
         new_free_list_index = N_LISTS - 1;
       }
+      insert_header(new_chunk, new_free_list_index);
       return split_if_necessary(new_chunk, actual_size, new_free_list_index); 
       //return new_chunk;
     }
