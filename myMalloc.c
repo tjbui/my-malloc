@@ -219,12 +219,7 @@ static void remove_header(header * block) {
 
 static void insert_header(header * remaining_block, int new_free_list_index) {
   header *new_sentinel = &freelistSentinels[new_free_list_index];
-  if (new_sentinel -> next != new_sentinel) {  
-    new_sentinel -> next -> prev = remaining_block;
-  } 
-  if (new_sentinel -> next == new_sentinel) {
-    new_sentinel -> prev = remaining_block;
-  }
+  new_sentinel -> next -> prev = remaining_block;
   remaining_block->next = new_sentinel->next; 
   remaining_block->prev = new_sentinel; 
   new_sentinel -> next = remaining_block;
@@ -290,32 +285,11 @@ static inline header * allocate_object(size_t raw_size) {
             new_free_list_index = N_LISTS - 1;
           }
           if (new_free_list_index == free_list_index) {
-
-            /* remaining_block is already in correct free list */
-
             return allocated_block;
           }
           else {
-
-            /* remove remaining_block from free list and insert into appropriate one */
-
             remove_header(current);
-
-            /* insert */
-
             insert_header(remaining_block, new_free_list_index);
-/*
-            header *new_sentinel = &freelistSentinels[new_free_list_index];
-            if (new_sentinel -> next != new_sentinel) {
-              new_sentinel -> next -> prev = remaining_block;
-            }
-            if (new_sentinel -> next == new_sentinel) {
-              new_sentinel -> prev = remaining_block;
-            }
-            remaining_block->next = new_sentinel->next;
-            remaining_block->prev = new_sentinel;
-            new_sentinel -> next = remaining_block;
-*/
             return allocated_block;
           }
         }
@@ -350,17 +324,60 @@ static inline header * ptr_to_header(void * p) {
   return (header *)((char *) p - ALLOC_HEADER_SIZE); //sizeof(header));
 }
 
+/* */
+
+
 /**
  * @brief Helper to manage deallocation of a pointer returned by the user
  *
  * @param p The pointer returned to the user by a call to malloc
  */
 static inline void deallocate_object(void * p) {
-  // TODO implement deallocation
-  (void) p;
-  assert(false);
-  exit(1);
+  if (p == NULL) {
+        return;
+  }
+  header *current = (header *)((char *)p - sizeof(header));
+  header *right = get_right_header(current);
+  header *left = (header *)((char *)current - current->left_size);
+  int right_unallocated = (get_state(right) == UNALLOCATED);
+  int left_unallocated = (get_state(left) == UNALLOCATED);
+
+  if (!right_unallocated && !left_unallocated) {
+      // Case 1: Neither neighbor is unallocated
+      current->size_state = current_size | UNALLOCATED;
+      insert_block(current);
+  } else if (right_unallocated && !left_unallocated) {
+      // Case 2: Only the right block is unallocated
+      size_t new_size = current_size + get_size(right);
+      remove_block(right);
+      current->size_state = new_size | UNALLOCATED;
+      header *new_right = get_right_header(current);
+      new_right->left_size = new_size;
+      insert_block(current);
+  } else if (!right_unallocated && left_unallocated) {
+      // Case 3: Only the left block is unallocated
+      size_t new_size = current_size + get_size(left);
+      remove_block(left);
+      left->size_state = new_size | UNALLOCATED;
+      header *new_right = get_right_header(left);
+      new_right->left_size = new_size;
+      insert_block(left);
+  } else {
+      // Case 4: Both neighbors are unallocated
+      size_t new_size = current_size + get_size(right) + get_size(left);
+      remove_block(right);
+      remove_block(left);
+      left->size_state = new_size | UNALLOCATED;
+      header *new_right = get_right_header(left);
+      new_right->left_size = new_size;
+      insert_block(left);
+  }
+  
+
+
 }
+
+
 
 /**
  * @brief Helper to detect cycles in the free list
