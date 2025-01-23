@@ -215,7 +215,22 @@ static void remove_header(header * block) {
   }
 }
 
-/** TODO
+/* helper function to insert header into correct list*/
+
+static void insert_header(header * remaining_block, int new_free_list_index) {
+  header *new_sentinel = &freelistSentinels[new_free_list_index];
+  if (new_sentinel -> next != new_sentinel) {  
+    new_sentinel -> next -> prev = remaining_block;
+  } 
+  if (new_sentinel -> next == new_sentinel) {
+    new_sentinel -> prev = remaining_block;
+  }
+  remaining_block->next = new_sentinel->next; 
+  remaining_block->prev = new_sentinel; 
+  new_sentinel -> next = remaining_block;
+}
+
+/** 
  * @brief Helper allocate an object given a raw request size from the user
  *
  * @param raw_size number of bytes the user needs
@@ -288,6 +303,8 @@ static inline header * allocate_object(size_t raw_size) {
 
             /* insert */
 
+            insert_header(remaining_block, new_free_list_index);
+/*
             header *new_sentinel = &freelistSentinels[new_free_list_index];
             if (new_sentinel -> next != new_sentinel) {
               new_sentinel -> next -> prev = remaining_block;
@@ -298,6 +315,7 @@ static inline header * allocate_object(size_t raw_size) {
             remaining_block->next = new_sentinel->next;
             remaining_block->prev = new_sentinel;
             new_sentinel -> next = remaining_block;
+*/
             return allocated_block;
           }
         }
