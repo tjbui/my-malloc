@@ -183,9 +183,12 @@ static header * allocate_chunk(size_t size) {
 
 static size_t calculate_actual_size(size_t raw_size) {
   size_t aligned_raw_size = ALIGN(raw_size);
-  size_t actual_size = aligned_raw_size = 16;
-  if (actual_size < sizeof(header)) {
+  size_t actual_size;
+  if (aligned_raw_size <= 16) {
     actual_size = sizeof(header);
+  }
+  else {
+    actual_size = aligned_raw_size;
   }
   return actual_size;
 }
@@ -336,7 +339,7 @@ static inline void deallocate_object(void * p) {
   if (p == NULL) {
         return;
   }
-  header *current = (header *)((char *)p - sizeof(header));
+  header *current = (header *)((char *)p - sizeof(header)); // not correct 
   size_t current_size = get_size(current);
   header *right = get_right_header(current);
   header *left = (header *)((char *)current - current->left_size);
@@ -348,7 +351,7 @@ static inline void deallocate_object(void * p) {
       // Case 1: Neither neighbor is unallocated
 
       set_state(current, UNALLOCATED);
-      int free_list_index = get_free_list_index(get_size(current));
+      int free_list_index =  (get_size(current) / 8) - 1;
       insert_header(current, free_list_index);
   } else if (right_unallocated && !left_unallocated) {
 
@@ -360,7 +363,7 @@ static inline void deallocate_object(void * p) {
       set_size(current, new_size);
       header *new_right = get_right_header(current);
       new_right->left_size = new_size;
-      int free_list_index = get_free_list_index(get_size(current));
+      int free_list_index =  (get_size(current) / 8) - 1;
       insert_header(current, free_list_index);
   } else if (!right_unallocated && left_unallocated) {
 
@@ -372,7 +375,7 @@ static inline void deallocate_object(void * p) {
       set_size(left, new_size);
       header *new_right = get_right_header(left);
       new_right->left_size = new_size;
-      int free_list_index = get_free_list_index(get_size(left));
+      int free_list_index =  (get_size(current) / 8) - 1;
       insert_header(left, free_list_index);
   } else {
 
@@ -385,7 +388,7 @@ static inline void deallocate_object(void * p) {
       set_size(left, new_size);
       header *new_right = get_right_header(left);
       new_right->left_size = new_size;
-      int free_list_index = get_free_list_index(get_size(left));
+      int free_list_index =  (get_size(current) / 8) - 1;
       insert_header(left, free_list_index);
   }
 }
