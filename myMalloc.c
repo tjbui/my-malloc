@@ -304,7 +304,7 @@ static inline header * allocate_object(size_t raw_size) {
     //set_state(block, ALLOCATED);
     //remove_header(block);
     //return block;
-    return split_if_necessary(block, actual_sizem free_list_index);
+    return split_if_necessary(block, actual_size, free_list_index);
   }
   else { 
     header *sentinel = &freelistSentinels[N_LISTS - 1];
