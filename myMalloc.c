@@ -346,7 +346,7 @@ static inline void deallocate_object(void * p) {
 
   header *current = (header *)((char *) p - sizeof(header));
   if (get_state(current) != ALLOCATED) {
-    current = (header *)((char *) p - (2 * sizeof(size_t));
+    current = (header *)((char *) p - (2 * sizeof(size_t)));
   }
 
   size_t current_size = get_size(current);
