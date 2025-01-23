@@ -284,14 +284,7 @@ static inline header * allocate_object(size_t raw_size) {
 
             /* remove remaining_block from free list and insert into appropriate one */
 
-            /* remove */
             remove_header(current);
-            //if (current -> prev != NULL) {
-            //  current -> prev -> next = current -> next;
-            //}
-            //if (current -> next != NULL) {
-            //  current -> next -> prev = current -> prev;
-           // }
 
             /* insert */
 
@@ -313,15 +306,7 @@ static inline header * allocate_object(size_t raw_size) {
           /* If block is large enough to fulfill request, but not split */
 
           set_state(current, ALLOCATED);
-
-          /* remove */
-           
-          if (current -> prev != NULL) {
-          current -> prev -> next = current -> next;
-          }
-          if (current -> next != NULL) {
-            current -> next -> prev = current -> prev;
-          }
+          remove_header(current);
           return current;
         }
       }
