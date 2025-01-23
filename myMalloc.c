@@ -180,6 +180,7 @@ static header * allocate_chunk(size_t size) {
 }
 
 /* helper function calculate actual size from raw size*/
+
 static size_t calculate_actual_size(size_t raw_size) {
   size_t aligned_raw_size = ALIGN(raw_size);
   size_t actual_size = aligned_raw_size = 16;
@@ -188,6 +189,21 @@ static size_t calculate_actual_size(size_t raw_size) {
   }
   return actual_size;
 }
+
+/* helper function get free_list_index given actual_size */
+
+int get_free_list_index(size_t actual_size) {
+  int free_list_index = (actual_size / 8) - 1;
+
+  /* iterate through free_lists until reach non empty OR last list*/
+  
+  while ((freelistSentinels[free_list_index].next == &freelistSentinels[free_list_index])
+          && (free_list_index < (N_LISTS - 1))) {
+    free_list_index++;
+  }
+}
+
+
 
 /** TODO
  * @brief Helper allocate an object given a raw request size from the user
@@ -202,14 +218,7 @@ static inline header * allocate_object(size_t raw_size) {
         return NULL;
   }
   size_t actual_size = calculate_actual_size(raw_size);
-  int free_list_index = (actual_size / 8) - 1;
-
-  /* iterate through free_lists until reach non empty OR last list*/
-  
-  while ((freelistSentinels[free_list_index].next == &freelistSentinels[free_list_index])
-          && (free_list_index < (N_LISTS - 1))) {
-    free_list_index++;
-  }
+  int free_list_index = get_free_list_index(actual_size);
  
   /* If free_list_index isn't the last index, set the block to allocated and
      return the block's data pointer. If it is the last index, traverse the last
