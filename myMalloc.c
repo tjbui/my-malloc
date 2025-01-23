@@ -184,11 +184,11 @@ static header * allocate_chunk(size_t size) {
 static size_t calculate_actual_size(size_t raw_size) {
   size_t aligned_raw_size = ALIGN(raw_size);
   size_t actual_size;
-  if (aligned_raw_size <= 16) {
+  if (aligned_raw_size <= ALLOC_HEADER_SIZE) {
     actual_size = sizeof(header);
   }
   else {
-    actual_size = aligned_raw_size;
+    actual_size = aligned_raw_size + ALLOC_HEADER_SIZE;
   }
   return actual_size;
 }
@@ -308,14 +308,57 @@ static inline header * allocate_object(size_t raw_size) {
       }
       current = current->next;
     }
-
-    /* No memory block available. Manage additional chunks*/
-
-    
   }
 
   /* Task 3: Managing Additional Chunks (no available blocks satsify allocation request */
   
+  while (true) {
+    header * new_chunk = allocate_chunk(ARENA_SIZE);
+    if (new_chunk == NULL) {
+      return NULL;
+    }
+    header * fenceBeforeChunk = (new_chunk - (2 * sizeOf(header)));
+
+    /* check if lastFencePost is next to new chunk and coalesce if necessary */
+
+    if (fenceBeforeChunk == lastFencePost) {
+      
+      /* case 1: neighbors */
+
+      /* Check if previous block is allocated or unallocated */
+
+      header * previousBlock = lastFencePost - (lastFencePost -> left_size);
+      if (get_state(previousBlock) == UNALLOCATED) {
+        set_size(previousBlock,
+                 get_size(previousBlock) + (2 * sizeOf(header)) + get_size(new_chunk));
+        lastFencePost = (header *) ((char *) previousBlock + 
+                 get_size(previousBlock) + (2 * sizeOf(header)) + get_size(new_chunk));
+        new_chunk = previousBlock;
+      }
+      else {
+        set_size(lastFencePost,
+                 (2 * sizeOf(header) + get_size(new_chunk)));
+        set_state(lastFencePost, UNALLOCATED);
+        lastFencePost = (header *) ((char *) lastFencePost + 
+                 (2 * sizeOf(header)) + get_size(new_chunk));
+        new_chunk = lastFencePost;
+      }
+    }
+    else {
+
+      /* case 2: not neighbors: just insert into free_list */
+
+      insert_header(new_chunk, ); //needs index
+    }
+
+    /* check if new size is big enough for the request: actual_size */
+
+    if (new_chunk >= actual_size) {
+      return new_chunk;
+      break;
+    }
+
+  }
 }
 
 /**
