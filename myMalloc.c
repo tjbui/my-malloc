@@ -358,7 +358,10 @@ static inline header * allocate_object(size_t raw_size) {
 
       /* case 2: not neighbors: just insert into free_list */
 
-      int new_free_list_index = (get_size(new_chunk) / 8) - 1;
+      int new_free_list_index = ((get_size(new_chunk) - ALLOC_HEADER_SIZE) / 8) - 1;
+      if (new_free_list_index > N_LISTS - 1) {
+        new_free_list_index = N_LISTS - 1;
+      }
       insert_header(new_chunk, new_free_list_index);
     }
 
