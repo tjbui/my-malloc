@@ -180,7 +180,7 @@ static header * allocate_chunk(size_t size) {
 }
 
 /* helper function calculate actual size from raw size*/
-static size_t calculate_actual_size(raw_size) {
+static size_t calculate_actual_size(size_t raw_size) {
   size_t aligned_raw_size = ALIGN(raw_size);
   size_t actual_size = aligned_raw_size = 16;
   if (actual_size < sizeof(header)) {
