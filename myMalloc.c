@@ -330,17 +330,17 @@ static inline header * allocate_object(size_t raw_size) {
       header * previousBlock = lastFencePost - (lastFencePost -> left_size);
       if (get_state(previousBlock) == UNALLOCATED) {
         set_size(previousBlock,
-                 get_size(previousBlock) + (2 * sizeOf(header)) + get_size(new_chunk));
+                 get_size(previousBlock) + (2 * sizeof(header)) + get_size(new_chunk));
         lastFencePost = (header *) ((char *) previousBlock + 
-                 get_size(previousBlock) + (2 * sizeOf(header)) + get_size(new_chunk));
+                 get_size(previousBlock) + (2 * sizeof(header)) + get_size(new_chunk));
         new_chunk = previousBlock;
       }
       else {
         set_size(lastFencePost,
-                 (2 * sizeOf(header) + get_size(new_chunk)));
+                 (2 * sizeof(header) + get_size(new_chunk)));
         set_state(lastFencePost, UNALLOCATED);
         lastFencePost = (header *) ((char *) lastFencePost + 
-                 (2 * sizeOf(header)) + get_size(new_chunk));
+                 (2 * sizeof(header)) + get_size(new_chunk));
         new_chunk = lastFencePost;
       }
     }
