@@ -255,7 +255,7 @@ static header * split_if_necessary(header * current, size_t actual_size, int fre
 
           // remaining_block needs to be placed in correct free list 
 
-          int new_free_list_index = (get_size(remaining_block) / 8) - 1;
+          int new_free_list_index = ((get_size(remaining_block) - ALLOC_HEADER_SIZE) / 8) - 1;
           if (new_free_list_index > N_LISTS - 1) {
             new_free_list_index = N_LISTS - 1;
           }
