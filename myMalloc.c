@@ -368,7 +368,12 @@ static inline header * allocate_object(size_t raw_size) {
     /* check if new size is big enough for the request: actual_size */
 
     if (get_size(new_chunk) >= actual_size) {
-      return new_chunk;
+      int new_free_list_index = ((get_size(new_chunk) - ALLOC_HEADER_SIZE) / 8) - 1;
+      if (new_free_list_index > N_LISTS - 1) {
+        new_free_list_index = N_LISTS - 1;
+      }
+      return split_if_necessary(new_chunk, actual_size, new_free_list_index); 
+      //return new_chunk;
     }
   }
 }
