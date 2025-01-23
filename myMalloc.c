@@ -224,25 +224,30 @@ static inline header * allocate_object(size_t raw_size) {
     while (current != sentinel) {
       if (get_size(current) >= actual_size) {
         
+        /* Block of sufficient size found */
+
         /* Split if necessary. Update size and left size fields of 
            neighboring block. Update allocation state of allcoated 
            block to ALLOCATED. Return data pointer */
         
         if (get_size(current) > actual_size + sizeof(header)) {
+
+          /* update remmaining and allocated blocks */
+
           header *remaining_block = current;
-          remaining_block -> size_state = get_size(current) - actual_size;
-          remaining_block -> size_state |= UNALLOCATED;
-
-          /* remove allocated block from free list */
-
+          set_size(remaining_block, get_size(current) - actual_size);
+          //remaining_block -> size_state = get_size(current) - actual_size;
+          set_state(remaining_block, UNALLOCATED);
+          //remaining_block -> size_state |= UNALLOCATED;
           header *allocated_block = (header *) get_right_header(remaining_block);
-          allocated_block -> size_state = actual_size;
+          set_size(allocated_block, actual_size);
+          //allocated_block -> size_state = actual_size;
           allocated_block -> left_size = get_size(remaining_block);
-          allocated_block -> size_state |= ALLOCATED;
-
+          set_state(allocated_block, ALLOCATED);
+          //allocated_block -> size_state |= ALLOCATED;
           header *right_block = get_right_header(allocated_block);
           if (get_size(right_block) != 0) {
-            right_block->left_size = get_size(allocated_block);//)actual_size;
+            right_block->left_size = get_size(allocated_block);
           }
 
 /*
@@ -275,12 +280,18 @@ static inline header * allocate_object(size_t raw_size) {
 
           return allocated_block;
         }
-        //current->size_state = actual_size;
-        //current->size_state |= ALLOCATED;
-        //return current;
+        else {
+              
+          /* If block is large enough to fulfill request, but not split */
+
+          
+        }
       }
       current = current->next;
     }
+
+    /* No memory block available. Manage additional chunks*/
+
   }
 
   /* Task 3: Managing Additional Chunks (no available blocks satsify allocation request */
