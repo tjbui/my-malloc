@@ -201,7 +201,7 @@ static inline header * allocate_object(size_t raw_size) {
   if (raw_size == 0) {
         return NULL;
   }
-  size_t actual_size = calculateactual_size(raw_size);
+  size_t actual_size = calculate_actual_size(raw_size);
   int free_list_index = (actual_size / 8) - 1;
 
   /* iterate through free_lists until reach non empty OR last list*/
