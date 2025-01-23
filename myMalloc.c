@@ -301,9 +301,10 @@ static inline header * allocate_object(size_t raw_size) {
 
   if (free_list_index < N_LISTS - 1) {
     header *block = freelistSentinels[free_list_index].next;
-    set_state(block, ALLOCATED);
-    remove_header(block);
-    return block;
+    //set_state(block, ALLOCATED);
+    //remove_header(block);
+    //return block;
+    return split_if_necessary(block, actual_sizem free_list_index);
   }
   else { 
     header *sentinel = &freelistSentinels[N_LISTS - 1];
@@ -314,56 +315,6 @@ static inline header * allocate_object(size_t raw_size) {
         /* Block of sufficient size found */
 
         return split_if_necessary(current, actual_size, free_list_index);
-
-
-/*
-        // Split if necessary. Update size and left size fields of 
-        //   neighboring block. Update allocation state of allcoated 
-        //   block to ALLOCATED. Return data pointer 
-        
-        if (get_size(current) > actual_size + sizeof(header)) {
-
-          // update remaining, left, and allocated blocks 
-
-          header *remaining_block = current;
-          set_size(remaining_block, get_size(current) - actual_size);
-          set_state(remaining_block, UNALLOCATED);
-          header *allocated_block = (header *) get_right_header(remaining_block);
-          set_size(allocated_block, actual_size);
-          allocated_block -> left_size = get_size(remaining_block);
-          set_state(allocated_block, ALLOCATED);
-          header *right_block = get_right_header(allocated_block);
-          if (get_size(right_block) != 0) {
-            right_block->left_size = get_size(allocated_block);
-          }
-
-          // remaining_block needs to be placed in correct free list 
-
-          int new_free_list_index = (get_size(remaining_block) / 8) - 1;
-          if (new_free_list_index > N_LISTS - 1) {
-            new_free_list_index = N_LISTS - 1;
-          }
-          if (new_free_list_index == free_list_index) {
-            return allocated_block;
-          }
-          else {
-            remove_header(current);
-            insert_header(remaining_block, new_free_list_index);
-            return allocated_block;
-          }
-        }
-        else {
-              
-          // If block is large enough to fulfill request, but not split 
-
-          set_state(current, ALLOCATED);
-          remove_header(current);
-          return current;
-        }
-*/
-
-
-
       }
       current = current->next;
     }
