@@ -339,7 +339,14 @@ static inline void deallocate_object(void * p) {
   if (p == NULL) {
         return;
   }
-  header *current = (header *)((char *)p - sizeof(header)); // not correct 
+
+  /* calculate pointer to header from p */
+
+  header *current = (header *)((char *) p - sizeof(header));
+  if (get_state(current) != ALLOCATED) {
+    current = (header *)((char *) p - 16);
+  }
+
   size_t current_size = get_size(current);
   header *right = get_right_header(current);
   header *left = (header *)((char *)current - current->left_size);
