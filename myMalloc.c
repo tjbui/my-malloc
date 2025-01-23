@@ -231,7 +231,7 @@ static void insert_header(header * remaining_block, int new_free_list_index) {
 
 /* helper function to split */
 
-static header * split_if_necessary(header * current, size_t actual_size) {
+static header * split_if_necessary(header * current, size_t actual_size, int free_list_index) {
 
         // Split if necessary. Update size and left size fields of 
         //   neighboring block. Update allocation state of allcoated 
@@ -313,7 +313,7 @@ static inline header * allocate_object(size_t raw_size) {
         
         /* Block of sufficient size found */
 
-        return split_if_necessary(current, actual_size);
+        return split_if_necessary(current, actual_size, free_list_index);
 
 
 /*
