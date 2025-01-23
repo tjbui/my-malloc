@@ -337,44 +337,54 @@ static inline void deallocate_object(void * p) {
         return;
   }
   header *current = (header *)((char *)p - sizeof(header));
+  size_t current_size = get_size(current);
   header *right = get_right_header(current);
   header *left = (header *)((char *)current - current->left_size);
   int right_unallocated = (get_state(right) == UNALLOCATED);
   int left_unallocated = (get_state(left) == UNALLOCATED);
-/*
+
   if (!right_unallocated && !left_unallocated) {
+
       // Case 1: Neither neighbor is unallocated
-      current->size_state = current_size | UNALLOCATED;
+
+      set_state(current, UNALLOCATED);
       insert_block(current);
   } else if (right_unallocated && !left_unallocated) {
+
       // Case 2: Only the right block is unallocated
+
       size_t new_size = current_size + get_size(right);
-      remove_block(right);
-      current->size_state = new_size | UNALLOCATED;
+      remove_header(right);
+      set_state(current, UNALLOCATED);
+      set_size(current, new_size);
       header *new_right = get_right_header(current);
       new_right->left_size = new_size;
-      insert_block(current);
+      int free_list_index = get_free_list_index(current);
+      insert_header(current, free_list_index);
   } else if (!right_unallocated && left_unallocated) {
+
       // Case 3: Only the left block is unallocated
+
       size_t new_size = current_size + get_size(left);
-      remove_block(left);
-      left->size_state = new_size | UNALLOCATED;
-      header *new_right = get_right_header(left);
+      remove_header(left);
+      set_state(left, UNALLOCATED);
+      set_size(left, new_size);
       new_right->left_size = new_size;
+      header *new_right = get_right_header(left);
       insert_block(left);
   } else {
+
       // Case 4: Both neighbors are unallocated
+
       size_t new_size = current_size + get_size(right) + get_size(left);
       remove_block(right);
       remove_block(left);
-      left->size_state = new_size | UNALLOCATED;
+      set_state(left, UNALLOCATED);
+      set_size(left, new_size);
       header *new_right = get_right_header(left);
       new_right->left_size = new_size;
       insert_block(left);
   }
-  */
-
-
 }
 
 
