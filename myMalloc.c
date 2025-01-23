@@ -298,8 +298,16 @@ static inline header * allocate_object(size_t raw_size) {
               
           /* If block is large enough to fulfill request, but not split */
 
-          
-        }
+          set_state(block, ALLOCATED);
+
+          /* remove */
+           
+          if (block -> prev != NULL) {
+          block -> prev -> next = block -> next;
+          }
+          if (block -> next != NULL) {
+            block -> next -> prev = block -> prev;
+          }
       }
       current = current->next;
     }
