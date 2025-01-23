@@ -356,9 +356,7 @@ static inline header * allocate_object(size_t raw_size) {
 
     if (get_size(new_chunk) >= actual_size) {
       return new_chunk;
-      break;
     }
-
   }
 }
 
