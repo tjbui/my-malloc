@@ -237,7 +237,7 @@ static header * split_if_necessary(header * current, size_t actual_size, int fre
         //   neighboring block. Update allocation state of allcoated 
         //   block to ALLOCATED. Return data pointer 
         
-        if (get_size(current) > actual_size + sizeof(header)) {
+        if (get_size(current) >= actual_size + sizeof(header)) {
 
           // update remaining, left, and allocated blocks 
 
