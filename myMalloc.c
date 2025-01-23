@@ -309,6 +309,7 @@ static inline header * allocate_object(size_t raw_size) {
             current -> next -> prev = current -> prev;
           }
           return current;
+        }
       }
       current = current->next;
     }
@@ -318,7 +319,7 @@ static inline header * allocate_object(size_t raw_size) {
   }
 
   /* Task 3: Managing Additional Chunks (no available blocks satsify allocation request */
-
+  
 }
 
 /**
