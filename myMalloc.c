@@ -337,7 +337,7 @@ static inline header * allocate_object(size_t raw_size) {
 
       /* Check if previous block is allocated or unallocated */
 
-      header * previousBlock = lastFencePost - (lastFencePost -> left_size);
+      header * previousBlock = (header *)((char *)lastFencePost - lastFencePost->left_size);
       if (get_state(previousBlock) == UNALLOCATED) {
         set_size(previousBlock,
                  get_size(previousBlock) + (2 * sizeof(header)) + get_size(new_chunk));
