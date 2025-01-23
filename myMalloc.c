@@ -369,8 +369,8 @@ static inline void deallocate_object(void * p) {
       remove_header(left);
       set_state(left, UNALLOCATED);
       set_size(left, new_size);
-      new_right->left_size = new_size;
       header *new_right = get_right_header(left);
+      new_right->left_size = new_size;
       insert_block(left);
   } else {
 
