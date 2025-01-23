@@ -327,7 +327,7 @@ static inline header * allocate_object(size_t raw_size) {
     if (new_chunk == NULL) {
       return NULL;
     }
-    header *fenceBeforeChunk = (header *)((char *)new_chunk - 2 * sizeof(header));
+    header *fenceBeforeChunk = (header *)((char *)new_chunk - (2 * ALLOC_HEADER_SIZE));
 
     /* check if lastFencePost is next to new chunk and coalesce if necessary */
 
