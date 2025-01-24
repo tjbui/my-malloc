@@ -613,13 +613,14 @@ void * my_malloc(size_t size) {
 
   /* added lines below */
  
-  if (hdr == NULL) {
-    return NULL;
-  }
+
   void * data = hdr -> data; 
 
   pthread_mutex_unlock(&mutex);
     
+  if (hdr == NULL) {
+    return NULL;
+  }
   return data;
   /* return hdr; */
 }
