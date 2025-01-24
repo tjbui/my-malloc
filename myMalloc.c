@@ -301,7 +301,6 @@ static inline header * allocate_object(size_t raw_size) {
           && (free_list_index < (N_LISTS - 1))) {
     free_list_index++;
   }
-
  
   /* If free_list_index isn't the last index, set the block to allocated and
      return the block's data pointer. If it is the last index, traverse the last
@@ -363,20 +362,12 @@ static inline header * allocate_object(size_t raw_size) {
     /* case 2: not neighbors: just insert into free_list.  */
 
     int new_free_list_index = get_free_list_index(get_size(new_chunk));
-    //int new_free_list_index = ((get_size(new_chunk) - ALLOC_HEADER_SIZE) / 8) - 1;
-    //if (new_free_list_index > N_LISTS - 1) {
-    //  new_free_list_index = N_LISTS - 1;
-    //}
     insert_header(new_chunk, new_free_list_index);
 
     /* check if new size is big enough for the request: actual_size */
 
     if (get_size(new_chunk) >= actual_size) {
       int new_free_list_index = get_free_list_index(get_size(new_chunk));
-      //int new_free_list_index = ((get_size(new_chunk) - ALLOC_HEADER_SIZE) / 8) - 1;
-      //if (new_free_list_index > N_LISTS - 1) {
-      //  new_free_list_index = N_LISTS - 1;
-      //}
       return split_if_necessary(new_chunk, actual_size, new_free_list_index); 
     }
   }
@@ -425,7 +416,6 @@ static inline void deallocate_object(void * p) {
 
       set_state(current, UNALLOCATED);
       int free_list_index = get_free_list_index(get_size(current));
-      //int free_list_index =  ((get_size(current) - ALLOC_HEADER_SIZE) / 8) - 1;
       insert_header(current, free_list_index);
   } else if (right_unallocated && !left_unallocated) {
 
@@ -438,7 +428,6 @@ static inline void deallocate_object(void * p) {
       header *new_right = get_right_header(current);
       new_right->left_size = new_size;
       int free_list_index = get_free_list_index(new_size);
-      //int free_list_index =  ((new_size - ALLOC_HEADER_SIZE) / 8) - 1;
       insert_header(current, free_list_index);
   } else if (!right_unallocated && left_unallocated) {
 
@@ -451,7 +440,6 @@ static inline void deallocate_object(void * p) {
       header *new_right = get_right_header(left);
       new_right->left_size = new_size;
       int free_list_index = get_free_list_index(new_size);
-      //int free_list_index =  ((new_size - ALLOC_HEADER_SIZE) / 8) - 1;
       insert_header(left, free_list_index);
   } else {
 
@@ -465,7 +453,6 @@ static inline void deallocate_object(void * p) {
       header *new_right = get_right_header(left);
       new_right->left_size = new_size;
       int free_list_index = get_free_list_index(new_size);
-      //int free_list_index =  ((new_size - ALLOC_HEADER_SIZE) / 8) - 1;
       insert_header(left, free_list_index);
   }
 }
@@ -624,8 +611,11 @@ void * my_malloc(size_t size) {
   pthread_mutex_lock(&mutex);
   header * hdr = allocate_object(size);
 
-  /* added line below */
-
+  /* added lines below */
+ 
+  if (hdr == NULL) {
+    return NULL;
+  }
   void * data = hdr -> data; 
 
   pthread_mutex_unlock(&mutex);
