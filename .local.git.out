@@ -4265,3 +4265,46 @@ M	tests/test_split
 M	tests/test_verify
 M	tests/test_very_large
 Your branch is up to date with 'origin/master'.
+[master c37d4dc] Commit
+ Committer: Tru Trong Bui Jr <bui46@data.cs.purdue.edu>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 35 files changed, 84 insertions(+)
+ rewrite tests/test_all_lists (62%)
+ rewrite tests/test_coalesce_chunk_coalesce (62%)
+ rewrite tests/test_coalesce_chunk_insert (62%)
+ rewrite tests/test_corrupted_canary (62%)
+ rewrite tests/test_double_free (64%)
+ rewrite tests/test_exact (62%)
+ rewrite tests/test_free_both (64%)
+ rewrite tests/test_free_even (62%)
+ rewrite tests/test_free_insert (66%)
+ rewrite tests/test_free_left (62%)
+ rewrite tests/test_free_null (66%)
+ rewrite tests/test_free_odd (62%)
+ rewrite tests/test_free_right (62%)
+ rewrite tests/test_insert_chunk (62%)
+ rewrite tests/test_large (62%)
+ rewrite tests/test_locks (63%)
+ rewrite tests/test_malloc_large (62%)
+ rewrite tests/test_malloc_zero (62%)
+ rewrite tests/test_multi_malloc (66%)
+ rewrite tests/test_simple0 (63%)
+ rewrite tests/test_simple1 (61%)
+ rewrite tests/test_simple3 (63%)
+ rewrite tests/test_simple5 (62%)
+ rewrite tests/test_simple6 (61%)
+ rewrite tests/test_split (66%)
+ rewrite tests/test_verify (62%)
+M	.local.git.out
+Your branch is up to date with 'origin/master'.
