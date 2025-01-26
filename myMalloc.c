@@ -353,9 +353,12 @@ static inline header * allocate_object(size_t raw_size) {
         lastFencePost = (header *) ((char *) lastFencePost + get_size(new_chunk));
       }
     }
+    else {
 
-    /* case 2: not neighbors: just insert into free_list.  */
-
+      /* case 2: not neighbors: just insert into free_list.  */
+ 
+      lastFencePost = (header *) ((char *) new_chunk + get_size(new_chunk));
+    }    
     int new_free_list_index = get_free_list_index(get_size(new_chunk));
     insert_header(new_chunk, new_free_list_index);
 
