@@ -413,6 +413,7 @@ static inline void deallocate_object(void * p) {
 
   if (get_state(current) == UNALLOCATED) {
     fprintf(stderr, "Double Free Detected\n");
+    #line 577
     assert(false); // Terminate the program as specified
   }
 
