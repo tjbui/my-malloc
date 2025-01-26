@@ -350,8 +350,7 @@ static inline header * allocate_object(size_t raw_size) {
                  (2 * ALLOC_HEADER_SIZE + get_size(new_chunk)));
         set_state(lastFencePost, UNALLOCATED);
         new_chunk = lastFencePost;
-        lastFencePost = (header *) ((char *) lastFencePost + 
-                 (2 * ALLOC_HEADER_SIZE) + get_size(new_chunk));
+        lastFencePost = (header *) ((char *) lastFencePost + get_size(new_chunk));
       }
     }
 
