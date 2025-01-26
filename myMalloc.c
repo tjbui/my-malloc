@@ -344,6 +344,7 @@ static inline header * allocate_object(size_t raw_size) {
         lastFencePost = (header *) ((char *) previousBlock + 
                  get_size(previousBlock) + (2 * ALLOC_HEADER_SIZE) + get_size(new_chunk));
         new_chunk = previousBlock;
+        remove_header(new_chunk);
       }
       else {
         set_size(lastFencePost,
