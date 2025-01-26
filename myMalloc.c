@@ -438,13 +438,30 @@ static inline void deallocate_object(void * p) {
 
       set_state(current, UNALLOCATED);
       size_t new_size = current_size + get_size(right);
-      remove_header(right);
-      set_state(current, UNALLOCATED);
-      set_size(current, new_size);
-      header *new_right = get_right_header(current);
-      new_right->left_size = new_size;
-      int free_list_index = get_free_list_index(new_size);
-      insert_header(current, free_list_index);
+      if (get_free_list_index(get_size(right)) == 58) {
+        // Traverse the last free list to find the right block
+        header *current_in_list = freelistSentinels[58].next;
+        while (current_in_list != &freelistSentinels[58]) {
+            if (current_in_list == right) {
+                // Found the right block; update it directly
+                set_size(current_in_list, new_size);
+                set_state(current_in_list, UNALLOCATED);
+                header *new_right = get_right_header(current_in_list);
+                new_right->left_size = new_size;
+                break;
+            }
+            current_in_list = current_in_list->next;
+        } 
+      }
+      else {
+        remove_header(right);
+        set_state(current, UNALLOCATED);
+        set_size(current, new_size);
+        header *new_right = get_right_header(current);
+        new_right->left_size = new_size;
+        int free_list_index = get_free_list_index(new_size);
+        insert_header(current, free_list_index);
+      }
   } else if (!right_unallocated && left_unallocated) {
 
       // Case 3: Only the left block is unallocated
