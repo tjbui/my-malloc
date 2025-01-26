@@ -438,6 +438,9 @@ static inline void deallocate_object(void * p) {
 
       set_state(current, UNALLOCATED);
       size_t new_size = current_size + get_size(right);
+
+      /* stay in same spot of free list if last list*/
+
       if (get_free_list_index(get_size(right)) == 58) {
 
         // Traverse the last free list to find the right block
