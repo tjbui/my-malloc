@@ -402,6 +402,13 @@ static inline void deallocate_object(void * p) {
         return;
   }
 
+  /* check double free */
+
+  if (get_state(ptr_to_header(p)) == UNALLOCATED) {
+    fprintf(stderr, "Double Free Detected\n");
+    assert(false); // Terminate the program as specified
+  }
+
   /* calculate pointer to header from p */
 
   header *current = (header *)((char *) p - sizeof(header));
