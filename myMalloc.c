@@ -399,14 +399,7 @@ static inline header * ptr_to_header(void * p) {
  */
 static inline void deallocate_object(void * p) {
   if (p == NULL) {
-        return;
-  }
-
-  /* check double free */
-
-  if (get_state(ptr_to_header(p)) == UNALLOCATED) {
-    fprintf(stderr, "Double Free Detected\n");
-    assert(false); // Terminate the program as specified
+    return;
   }
 
   /* calculate pointer to header from p */
@@ -415,6 +408,15 @@ static inline void deallocate_object(void * p) {
   if (get_state(current) != ALLOCATED) {
     current = (header *)((char *) p - (2 * sizeof(size_t)));
   }
+
+  /* check double free */
+
+  if (get_state(current) == UNALLOCATED) {
+    fprintf(stderr, "Double Free Detected\n");
+    assert(false); // Terminate the program as specified
+  }
+
+  /* continue */
 
   size_t current_size = get_size(current);
   header *right = get_right_header(current);
