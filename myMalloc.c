@@ -435,6 +435,7 @@ static inline void deallocate_object(void * p) {
 
       // Case 2: Only the right block is unallocated
 
+      set_state(current, UNALLOCATED);
       size_t new_size = current_size + get_size(right);
       remove_header(right);
       set_state(current, UNALLOCATED);
@@ -447,6 +448,7 @@ static inline void deallocate_object(void * p) {
 
       // Case 3: Only the left block is unallocated
 
+      set_state(current, UNALLOCATED);
       size_t new_size = current_size + get_size(left);
       remove_header(left);
       set_state(left, UNALLOCATED);
@@ -459,6 +461,7 @@ static inline void deallocate_object(void * p) {
 
       // Case 4: Both neighbors are unallocated
 
+      set_state(current, UNALLOCATED);
       size_t new_size = current_size + get_size(right) + get_size(left);
       remove_header(right);
       remove_header(left);
