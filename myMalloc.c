@@ -345,6 +345,8 @@ static inline header * allocate_object(size_t raw_size) {
                  get_size(previousBlock) + (2 * ALLOC_HEADER_SIZE) + get_size(new_chunk));
         new_chunk = previousBlock;
         remove_header(new_chunk);
+        int new_free_list_index = get_free_list_index(get_size(new_chunk));
+        insert_header(new_chunk, new_free_list_index);
       }
       else {
         set_size(lastFencePost,
@@ -352,6 +354,8 @@ static inline header * allocate_object(size_t raw_size) {
         set_state(lastFencePost, UNALLOCATED);
         new_chunk = lastFencePost;
         lastFencePost = (header *) ((char *) lastFencePost + get_size(new_chunk));
+        int new_free_list_index = get_free_list_index(get_size(new_chunk));
+        insert_header(new_chunk, new_free_list_index);
       }
     }
     else {
@@ -361,10 +365,9 @@ static inline header * allocate_object(size_t raw_size) {
       header *prevFencePost = get_header_from_offset(new_chunk, -ALLOC_HEADER_SIZE);
       insert_os_chunk(prevFencePost);
       lastFencePost = (header *) ((char *) new_chunk + get_size(new_chunk));
-      
+      int new_free_list_index = get_free_list_index(get_size(new_chunk));
+      insert_header(new_chunk, new_free_list_index);
     }
-    int new_free_list_index = get_free_list_index(get_size(new_chunk));
-    insert_header(new_chunk, new_free_list_index);
 
     /* check if new size is big enough for the request: actual_size */
 
