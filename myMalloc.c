@@ -416,9 +416,6 @@ static inline void deallocate_object(void * p) {
     #line 577
     assert(false); // Terminate the program as specified
   }
-
-  /* continue */
-
   size_t current_size = get_size(current);
   header *right = get_right_header(current);
   header *left = (header *)((char *)current - current->left_size);
