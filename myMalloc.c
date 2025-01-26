@@ -439,15 +439,20 @@ static inline void deallocate_object(void * p) {
       set_state(current, UNALLOCATED);
       size_t new_size = current_size + get_size(right);
       if (get_free_list_index(get_size(right)) == 58) {
+
         // Traverse the last free list to find the right block
+
         header *current_in_list = freelistSentinels[58].next;
         while (current_in_list != &freelistSentinels[58]) {
             if (current_in_list == right) {
+
                 // Found the right block; update it directly
+
                 set_size(current_in_list, new_size);
+                current_in_list->left_size = current->left_size;
                 set_state(current_in_list, UNALLOCATED);
                 header *new_right = get_right_header(current_in_list);
-                new_right->left_size = new_size;
+                new_right -> left_size = new_size;
                 break;
             }
             current_in_list = current_in_list->next;
