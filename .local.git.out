@@ -3910,3 +3910,22 @@ M	tests/test_split
 M	tests/test_verify
 M	tests/test_very_large
 Your branch is up to date with 'origin/master'.
+[master 84dee04] Commit
+ Committer: Tru Trong Bui Jr <bui46@data.cs.purdue.edu>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 37 files changed, 57 insertions(+), 1 deletion(-)
+ delete mode 100644 .nfs0000000001b77f9f000034fa
+ delete mode 100644 .nfs0000000003ac75f7000034f2
+M	.local.git.out
+Your branch is up to date with 'origin/master'.
