@@ -482,7 +482,7 @@ static inline void deallocate_object(void * p) {
       // Case 3: Only the left block is unallocated
 
       set_state(current, UNALLOCATED);
-      size_t new_size = current_size + get_size(left)u
+      size_t new_size = current_size + get_size(left);
       if (get_free_list_index(get_size(left)) == 58) {
 
         // Traverse the last free list to find the right block
