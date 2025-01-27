@@ -481,7 +481,7 @@ static inline void deallocate_object(void * p) {
   } else {
 
       // Case 4: Both neighbors are unallocated
-
+/*
       if (get_free_list_index(get_size(left)) == 58) {
         printf("test");
       }
@@ -489,6 +489,7 @@ static inline void deallocate_object(void * p) {
         printf("test");
       }
       else {
+*/
         set_state(current, UNALLOCATED);
         size_t new_size = current_size + get_size(right) + get_size(left);
         remove_header(right);
@@ -499,7 +500,9 @@ static inline void deallocate_object(void * p) {
         new_right->left_size = new_size;
         int free_list_index = get_free_list_index(new_size);
         insert_header(left, free_list_index);
+/*
       }
+*/
   }
 }
 
