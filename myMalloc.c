@@ -466,7 +466,7 @@ static inline void deallocate_object(void * p) {
       if (get_free_list_index(get_size(left)) == 58) {
         set_size(left, new_size);
         set_state(left, UNALLOCATED);
-        header *new_right = get_right_header(current_in_list);
+        header *new_right = get_right_header(left);
         new_right -> left_size = new_size;
       }
       else {
