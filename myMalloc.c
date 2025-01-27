@@ -492,7 +492,7 @@ static inline void deallocate_object(void * p) {
      new_right->left_size = new_size;
      int free_list_index = get_free_list_index(new_size);
      insert_header(left, free_list_index);
-  }  
+  }
 }
 
 
