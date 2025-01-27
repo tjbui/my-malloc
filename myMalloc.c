@@ -433,9 +433,6 @@ static inline void deallocate_object(void * p) {
 
       // Case 2: Only the right block is unallocated
 
-      printf("\ninside right\n");
-      exit(0);
-      
       set_state(current, UNALLOCATED);
       size_t new_size = current_size + get_size(right);
 
@@ -474,6 +471,7 @@ static inline void deallocate_object(void * p) {
 
       // Case 3: Only the left block is unallocated
 
+      exit(0);
       set_state(current, UNALLOCATED);
       size_t new_size = current_size + get_size(left);
       remove_header(left);
@@ -487,6 +485,8 @@ static inline void deallocate_object(void * p) {
 
       // Case 4: Both neighbors are unallocated
 
+
+      exit(0);
       set_state(current, UNALLOCATED);
       size_t new_size = current_size + get_size(right) + get_size(left);
       remove_header(right);
