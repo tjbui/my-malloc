@@ -443,7 +443,7 @@ static inline void deallocate_object(void * p) {
         // Traverse the last free list to find the right block
 
 
-/*
+
         header *current_in_list = freelistSentinels[58].next;
         while (current_in_list != &freelistSentinels[58]) {
             if (current_in_list == right) {
@@ -459,13 +459,13 @@ static inline void deallocate_object(void * p) {
             }
             current_in_list = current_in_list->next;
         }
-*/
+/*
         set_size(right, new_size);
         right -> left_size = current -> left_size;
         set_state(right, UNALLOCATED);
         header *new_right = get_right_header(right);
         new_right -> left_size = new_size;
-        
+*/    
  
       }
       else {
