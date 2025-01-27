@@ -413,7 +413,7 @@ static inline void deallocate_object(void * p) {
 
   if (get_state(current) == UNALLOCATED) {
     fprintf(stderr, "Double Free Detected\n");
-    #line 577
+    //#line 577
     assert(false); // Terminate the program as specified
   }
   size_t current_size = get_size(current);
@@ -449,7 +449,7 @@ static inline void deallocate_object(void * p) {
                 // Found the right block; update it directly
 
                 set_size(current_in_list, new_size);
-                current_in_list->left_size = current->left_size;
+                current_in_list->left_size = current -> left_size;
                 set_state(current_in_list, UNALLOCATED);
                 header *new_right = get_right_header(current_in_list);
                 new_right -> left_size = new_size;
