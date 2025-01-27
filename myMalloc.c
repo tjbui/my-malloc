@@ -471,8 +471,10 @@ static inline void deallocate_object(void * p) {
 
       // Case 3: Only the left block is unallocated
 
-      printf("helllo1");
-      exit(0);
+      
+      
+
+
       set_state(current, UNALLOCATED);
       size_t new_size = current_size + get_size(left);
       remove_header(left);
