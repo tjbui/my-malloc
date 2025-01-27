@@ -413,7 +413,7 @@ static inline void deallocate_object(void * p) {
 
   if (get_state(current) == UNALLOCATED) {
     fprintf(stderr, "Double Free Detected\n");
-    //#line 577
+    #line 577
     assert(false); // Terminate the program as specified
   }
   size_t current_size = get_size(current);
@@ -494,18 +494,15 @@ static inline void deallocate_object(void * p) {
             current_in_list = current_in_list->next;
         } 
       }
-else {
-
-
-
-      remove_header(left);
-      set_state(left, UNALLOCATED);
-      set_size(left, new_size);
-      header *new_right = get_right_header(left);
-      new_right->left_size = new_size;
-      int free_list_index = get_free_list_index(new_size);
-      insert_header(left, free_list_index);
-}
+      else {
+        remove_header(left);
+        set_state(left, UNALLOCATED);
+        set_size(left, new_size);
+        header *new_right = get_right_header(left);
+        new_right->left_size = new_size;
+        int free_list_index = get_free_list_index(new_size);
+        insert_header(left, free_list_index);
+      }
   } else {
 
       // Case 4: Both neighbors are unallocated
