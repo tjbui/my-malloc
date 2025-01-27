@@ -471,12 +471,33 @@ static inline void deallocate_object(void * p) {
 
       // Case 3: Only the left block is unallocated
 
-      
-      
-
-
       set_state(current, UNALLOCATED);
       size_t new_size = current_size + get_size(left);
+
+
+      if (get_free_list_index(get_size(left)) == 58) {
+
+        // Traverse the last free list to find the right block
+
+        header *current_in_list = freelistSentinels[58].next;
+        while (current_in_list != &freelistSentinels[58]) {
+            if (current_in_list == left) {
+
+                // Found the right block; update it directly
+
+                set_size(current_in_list, new_size);
+                set_state(current_in_list, UNALLOCATED);
+                header *new_right = get_right_header(current_in_list);
+                new_right -> left_size = new_size;
+                break;
+            }
+            current_in_list = current_in_list->next;
+        } 
+      }
+else {
+
+
+
       remove_header(left);
       set_state(left, UNALLOCATED);
       set_size(left, new_size);
@@ -484,12 +505,11 @@ static inline void deallocate_object(void * p) {
       new_right->left_size = new_size;
       int free_list_index = get_free_list_index(new_size);
       insert_header(left, free_list_index);
+}
   } else {
 
       // Case 4: Both neighbors are unallocated
 
-      printf("hello2");
-      exit(0);
       set_state(current, UNALLOCATED);
       size_t new_size = current_size + get_size(right) + get_size(left);
       remove_header(right);
