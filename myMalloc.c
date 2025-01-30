@@ -674,7 +674,7 @@ void * my_calloc(size_t nmemb, size_t size) {
 
 void * my_realloc(void * ptr, size_t size) {
   
-  header * header = ptr - (ALLOCATED_HEADER_SIZE);
+  header * header = ptr - (ALLOC_HEADER_SIZE);
   header * right = get_right_header(header);
   size_t new_size = calculate_actual_size(size);
   
