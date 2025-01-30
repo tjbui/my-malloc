@@ -674,21 +674,21 @@ void * my_calloc(size_t nmemb, size_t size) {
 
 void * my_realloc(void * ptr, size_t size) {
 
-  header * header = ptr - (2 * sizeof(size_t));
-  header * right = get_right_header(header);
+  header * chunk = ptr - (2 * sizeof(size_t));
+  header * right = get_right_header(chunk);
   size_t new_size = calculate_actual_size(size);
   
-  //if ((get_state(right) == UNALLOCATED) && ((get_size(header) + get_size(right)) >= new_size)) {
-  //  set_size(header, new_size);
- // }
-  //else {
+  if ((get_state(right) == UNALLOCATED) && ((get_size(header) + get_size(right)) >= new_size)) {
+    set_size(header, new_size);
+  }
+  else {
 
     void * mem = my_malloc(size);
     memcpy(mem, ptr, size);
     my_free(ptr);
     return mem;
 
-  //}
+  }
 }
 
 void my_free(void * p) {
