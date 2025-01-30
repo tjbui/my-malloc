@@ -140,6 +140,9 @@ test_random_sizes: ${TEST_SRC_DIR}/test_random_sizes.c ${MALLOC_FILES} ${MALLOC_
 test_very_large: ${TEST_SRC_DIR}/test_random_sizes.c ${MALLOC_FILES} ${MALLOC_HEADERS}
 	${CC} ${CFLAGS} ${LDFLAGS} -DARENA_SIZE=2147483648 -o ${TEST_BIN_DIR}/$@ ${TEST_SRC_DIR}/$@.c ${MALLOC_FILES}
 
+test_realloc: ${TEST_SRC_DIR}/test_realloc.c ${MALLOC_FILES} ${MALLOC_HEADERS}
+	${CC} ${CFLAGS} ${LDFLAGS} -DARENA_SIZE=2147483648 -o ${TEST_BIN_DIR}/$@ ${TEST_SRC_DIR}/$@.c ${MALLOC_FILES}
+
 .PHONY: clean
 clean: 
 	rm -f test_*
