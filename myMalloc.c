@@ -689,8 +689,12 @@ void * my_realloc(void * ptr, size_t size) {
 
     header * right_of_right = get_right_header(new_right);
     right_of_right -> left_size = get_size(new_right);
+       
+    /* fix free list */
+
+    remove_header(right);
+    insert_header(new_right, get_free_list_index(get_size(new_right)));  
     return ptr;
- 
   }
   else {
     void * mem = my_malloc(size);
