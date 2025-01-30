@@ -85,6 +85,9 @@ static void init();
 
 static bool isMallocInitialized;
 
+/* extra credit bitmap */
+char freelist_bitmap[];
+
 /**
  * @brief Helper function to retrieve a header pointer from a pointer and an 
  *        offset
@@ -293,12 +296,19 @@ static header * split_if_necessary(header * current, size_t actual_size, int fre
  */
 
 static inline header * allocate_object(size_t raw_size) {
-  freelist_bitmap[0] = 1;
   if (raw_size == 0) {
         return NULL;
   }
   size_t actual_size = calculate_actual_size(raw_size);
   int free_list_index = get_free_list_index(actual_size);
+/*
+  for (int i = 0; i < N_LISTS - 1; i++) {
+    if (freelist_bitmap[i] == 1) {
+      break;
+    }
+  }
+*/
+
   while ((freelistSentinels[free_list_index].next == &freelistSentinels[free_list_index])
           && (free_list_index < (N_LISTS - 1))) {
     free_list_index++;
