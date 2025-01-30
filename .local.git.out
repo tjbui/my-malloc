@@ -5589,3 +5589,53 @@ M	tests/test_split
 M	tests/test_verify
 M	tests/test_very_large
 Your branch is up to date with 'origin/master'.
+[master 9d9c67b] Commit
+ Committer: Tru Trong Bui Jr <bui46@data.cs.purdue.edu>
+Your name and email address were configured automatically based
+on your username and hostname. Please check that they are accurate.
+You can suppress this message by setting them explicitly. Run the
+following command and follow the instructions in your editor to edit
+your configuration file:
+
+    git config --global --edit
+
+After doing this, you may fix the identity used for this commit with:
+
+    git commit --amend --reset-author
+
+ 35 files changed, 88 insertions(+), 1 deletion(-)
+ rewrite tests/test_all_lists (82%)
+ rewrite tests/test_coalesce_chunk_coalesce (82%)
+ rewrite tests/test_coalesce_chunk_insert (81%)
+ rewrite tests/test_corrupted_canary (82%)
+ rewrite tests/test_double_free (82%)
+ rewrite tests/test_exact (80%)
+ rewrite tests/test_free_both (81%)
+ rewrite tests/test_free_even (82%)
+ rewrite tests/test_free_insert (81%)
+ rewrite tests/test_free_left (81%)
+ rewrite tests/test_free_null (81%)
+ rewrite tests/test_free_odd (82%)
+ rewrite tests/test_free_right (81%)
+ rewrite tests/test_insert_chunk (81%)
+ rewrite tests/test_large (82%)
+ rewrite tests/test_locks (82%)
+ rewrite tests/test_malloc_large (81%)
+ rewrite tests/test_malloc_too_large (79%)
+ rewrite tests/test_malloc_zero (82%)
+ rewrite tests/test_multi_malloc (80%)
+ rewrite tests/test_out_of_ram (71%)
+ rewrite tests/test_random (78%)
+ rewrite tests/test_random_sizes (60%)
+ rewrite tests/test_simple0 (82%)
+ rewrite tests/test_simple1 (81%)
+ rewrite tests/test_simple2 (81%)
+ rewrite tests/test_simple3 (73%)
+ rewrite tests/test_simple4 (73%)
+ rewrite tests/test_simple5 (82%)
+ rewrite tests/test_simple6 (73%)
+ rewrite tests/test_split (80%)
+ rewrite tests/test_verify (81%)
+ rewrite tests/test_very_large (60%)
+M	.local.git.out
+Your branch is up to date with 'origin/master'.
