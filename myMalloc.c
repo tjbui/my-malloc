@@ -75,6 +75,12 @@ static inline bool verify_freelist();
 static inline header * verify_chunk(header * chunk);
 static inline bool verify_tags();
 
+// extra credit functions
+void* memalign(size_t alignment, size_t size);
+void* valloc(size_t size);
+int posix_memalign(void** ptr, size_t alignment, size_t size);
+void* pvalloc(size_t size);
+
 static void init();
 
 static bool isMallocInitialized;
@@ -170,7 +176,6 @@ inline static void insert_fenceposts(void * raw_mem, size_t size) {
  */
 static header * allocate_chunk(size_t size) {
   void * mem = sbrk(size);
-  exit(0);
   insert_fenceposts(mem, size);
   header * hdr = (header *) ((char *)mem + ALLOC_HEADER_SIZE);
   set_state(hdr, UNALLOCATED);
@@ -911,4 +916,35 @@ void tags_print(printFormatter pf) {
     pf(chunk);
     fflush(stdout);
   }
+}
+
+/* extra credit */
+
+// Function 1: memalign()
+void* memalign(size_t alignment, size_t size) {
+    // Ensure alignment is a power of 2 and greater than or equal to sizeof(void*)
+    // Allocate memory with the specified alignment
+    // Return pointer to the allocated memory or NULL on failure
+}
+
+// Function 2: valloc()
+void* valloc(size_t size) {
+    // Get the system page size
+    // Call memalign() with page size alignment
+    // Return pointer to allocated memory or NULL on failure
+}
+
+// Function 3: posix_memalign()
+int posix_memalign(void** ptr, size_t alignment, size_t size) {
+    // Ensure alignment is a power of 2 and a multiple of sizeof(void*)
+    // Allocate aligned memory and store the pointer in *ptr
+    // Return 0 on success or an error code on failure
+}
+
+// Function 4: pvalloc()
+void* pvalloc(size_t size) {
+    // Get the system page size
+    // Round size up to the nearest multiple of page size
+    // Call memalign() with page size alignment
+    // Return pointer to allocated memory or NULL on failure
 }
