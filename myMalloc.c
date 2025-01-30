@@ -680,6 +680,7 @@ void * my_realloc(void * ptr, size_t size) {
   
   if ((get_state(right) == UNALLOCATED) && ((get_size(chunk) + get_size(right)) >= new_size)) {
     set_size(chunk, new_size);
+    
   }
   else {
 
