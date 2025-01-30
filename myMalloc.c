@@ -673,7 +673,7 @@ void * my_calloc(size_t nmemb, size_t size) {
 }
 
 void * my_realloc(void * ptr, size_t size) {
-  
+/*
   header * header = ptr - (ALLOC_HEADER_SIZE);
   header * right = get_right_header(header);
   size_t new_size = calculate_actual_size(size);
@@ -682,11 +682,13 @@ void * my_realloc(void * ptr, size_t size) {
     set_size(header, new_size);
   }
   else {
+*/
     void * mem = my_malloc(size);
     memcpy(mem, ptr, size);
     my_free(ptr);
     return mem;
-  }
+
+  //}
 }
 
 void my_free(void * p) {
