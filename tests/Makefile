@@ -125,6 +125,9 @@ test_double_free: ${TEST_SRC_DIR}/test_double_free.c ${MALLOC_FILES} ${MALLOC_HE
 test_out_of_ram: ${TEST_SRC_DIR}/test_out_of_ram.c ${MALLOC_FILES} ${MALLOC_HEADERS}
 	${CC} ${CFLAGS} ${LDFLAGS} -DARENA_SIZE=1024 -o ${TEST_BIN_DIR}/$@ ${TEST_SRC_DIR}/$@.c ${MALLOC_FILES}
 
+test_realloc: ${TEST_SRC_DIR}/test_realloc.c ${MALLOC_FILES} ${MALLOC_HEADERS}
+	${CC} ${CFLAGS} ${LDFLAGS} -DARENA_SIZE=1024 -o ${TEST_BIN_DIR}/$@ ${TEST_SRC_DIR}/$@.c ${MALLOC_FILES}
+
 test_all_lists: ${TEST_SRC_DIR}/test_all_lists.c ${MALLOC_FILES} ${MALLOC_HEADERS}
 	${CC} ${CFLAGS} ${LDFLAGS} -DARENA_SIZE=2147483648 -o ${TEST_BIN_DIR}/$@ ${TEST_SRC_DIR}/$@.c ${MALLOC_FILES}
 
@@ -138,9 +141,6 @@ test_random_sizes: ${TEST_SRC_DIR}/test_random_sizes.c ${MALLOC_FILES} ${MALLOC_
 	${CC} ${CFLAGS} ${LDFLAGS} -DARENA_SIZE=2147483648 -o ${TEST_BIN_DIR}/$@ ${TEST_SRC_DIR}/$@.c ${MALLOC_FILES}
 
 test_very_large: ${TEST_SRC_DIR}/test_random_sizes.c ${MALLOC_FILES} ${MALLOC_HEADERS}
-	${CC} ${CFLAGS} ${LDFLAGS} -DARENA_SIZE=2147483648 -o ${TEST_BIN_DIR}/$@ ${TEST_SRC_DIR}/$@.c ${MALLOC_FILES}
-
-test_realloc: ${TEST_SRC_DIR}/test_realloc.c ${MALLOC_FILES} ${MALLOC_HEADERS}
 	${CC} ${CFLAGS} ${LDFLAGS} -DARENA_SIZE=2147483648 -o ${TEST_BIN_DIR}/$@ ${TEST_SRC_DIR}/$@.c ${MALLOC_FILES}
 
 .PHONY: clean
