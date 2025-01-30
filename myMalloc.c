@@ -293,6 +293,7 @@ static header * split_if_necessary(header * current, size_t actual_size, int fre
  */
 
 static inline header * allocate_object(size_t raw_size) {
+  freelist_bitmap[0] = 1;
   if (raw_size == 0) {
         return NULL;
   }
@@ -652,20 +653,23 @@ static void init() {
  */
 void * my_malloc(size_t size) {
   pthread_mutex_lock(&mutex);
+
+/* new */
+  if (!isMallocInitialized) {
+    isMallocInitialized = 1;
+    init();
+
+  }
+/* new */
+
   header * hdr = allocate_object(size);
-
-  /* added lines below */
- 
-
   void * data = hdr -> data; 
-
   pthread_mutex_unlock(&mutex);
     
   if (hdr == NULL) {
     return NULL;
   }
   return data;
-  /* return hdr; */
 }
 
 void * my_calloc(size_t nmemb, size_t size) {
