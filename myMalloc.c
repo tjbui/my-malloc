@@ -665,11 +665,11 @@ void * my_malloc(size_t size) {
   pthread_mutex_lock(&mutex);
 
 /* new */
-  if (!isMallocInitialized) {
-    isMallocInitialized = 1;
-    init();
-
-  }
+//  if (!isMallocInitialized) {
+//    isMallocInitialized = 1;
+//    init();
+//
+//  }
 /* new */
 
   header * hdr = allocate_object(size);
