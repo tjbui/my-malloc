@@ -241,6 +241,7 @@ static void remove_header(header * block) {
   if (block -> next != NULL) {
     block -> next -> prev = block -> prev;
   }
+  check_free_list_index(get_free_list_index(get_size(block)));
 }
 
 /* helper function to insert header into correct list*/
@@ -251,6 +252,7 @@ static void insert_header(header * remaining_block, int new_free_list_index) {
   remaining_block->next = new_sentinel->next; 
   remaining_block->prev = new_sentinel; 
   new_sentinel -> next = remaining_block;
+  check_free_list_index(new_free_list_idex);
 }
 
 /* helper function to split */
