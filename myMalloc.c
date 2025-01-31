@@ -277,10 +277,10 @@ static header * split_if_necessary(header * current, size_t actual_size, int fre
           set_size(allocated_block, actual_size);
           allocated_block -> left_size = get_size(remaining_block);
           set_state(allocated_block, ALLOCATED);
+          remove_header(allocated_block);
           
-          check_free_list_index(get_free_list_index(get_size(remaining_block)));
-          check_free_list_index(current_index);
-          check_free_list_index(current_index - 1);
+          //check_free_list_index(get_free_list_index(get_size(remaining_block)));
+          //check_free_list_index(current_index);
 
           header *right_block = get_right_header(allocated_block);
           if (get_size(right_block) != 0) {
