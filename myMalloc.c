@@ -223,10 +223,12 @@ static int get_free_list_index(size_t actual_size) {
 
 static void check_free_list_index(int free_list_index) {
   if (freelistSentinels[free_list_index].next == &freelistSentinels[free_list_index]) {
-    freelist_bitmap[free_list_index] = 0;
+    freelist_bitmap[free_list_index >> 3] &= ~(1 << (free_list_index & 7));
+    //freelist_bitmap[free_list_index] = 0;
   }
   else {
-    freelist_bitmap[free_list_index] = 1;
+    freelist_bitmap[free_list_index >> 3] |= (1 << (free_list_index & 7));
+    //freelist_bitmap[free_list_index] = 1;
   }
 }
 
@@ -321,7 +323,7 @@ static inline header * allocate_object(size_t raw_size) {
   /* bitmap optimization */
 
   for (int i = free_list_index; i < N_LISTS - 1; i++) {
-    if (freelist_bitmap[i] == 1) {
+    if ((freelist_bitmap[i >> 3] >> (i & 7)) & 1) {
       free_list_index = i;
       break;
     }
