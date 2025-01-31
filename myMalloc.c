@@ -320,7 +320,7 @@ static inline header * allocate_object(size_t raw_size) {
 
   /* bitmap optimization */
 
-  for (int i = 0; i < N_LISTS - 1; i++) {
+  for (int i = free_list_index; i < N_LISTS - 1; i++) {
     if (freelist_bitmap[i] == 1) {
       free_list_index = i;
       break;
