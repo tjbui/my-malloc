@@ -292,7 +292,7 @@ static header * split_if_necessary(header * current, size_t actual_size, int fre
 
 /* function to check if free_list_index is going to be empty and set to 0 if it is */
 
-static void check_free_list(int free_list_index) {
+static void check_free_list_index(int free_list_index) {
   if (freelistSentinels[free_list_index].next == &freelistSentinels[free_list_index]) {
     freelist_bitmap[free_list_index] = 0;
   }
