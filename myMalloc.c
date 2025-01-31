@@ -219,6 +219,19 @@ static int get_free_list_index(size_t actual_size) {
   return free_list_index;
 }
 
+/* function to check if free_list_index is going to be empty and set to 0 if it is */
+
+static void check_free_list_index(int free_list_index) {
+  if (freelistSentinels[free_list_index].next == &freelistSentinels[free_list_index]) {
+    freelist_bitmap[free_list_index] = 0;
+  }
+  else {
+    freelist_bitmap[free_list_index] = 1;
+  }
+}
+
+
+
 /* helper function to remove header from list */
 
 static void remove_header(header * block) {
@@ -273,9 +286,7 @@ static header * split_if_necessary(header * current, size_t actual_size, int fre
           }
           else {
             remove_header(current);
-            check_free_list_index(current_index);
             insert_header(remaining_block, new_free_list_index);
-            check_free_list_index(new_free_list_index);
             return allocated_block;
           }
         }
@@ -285,20 +296,8 @@ static header * split_if_necessary(header * current, size_t actual_size, int fre
 
           set_state(current, ALLOCATED);
           remove_header(current);
-          check_free_list_index(current_index);
           return current;
         }
-}
-
-/* function to check if free_list_index is going to be empty and set to 0 if it is */
-
-static void check_free_list_index(int free_list_index) {
-  if (freelistSentinels[free_list_index].next == &freelistSentinels[free_list_index]) {
-    freelist_bitmap[free_list_index] = 0;
-  }
-  else {
-    freelist_bitmap[free_list_index] = 1;
-  }
 }
 
 
@@ -381,10 +380,8 @@ static inline header * allocate_object(size_t raw_size) {
                  get_size(previousBlock) + (2 * ALLOC_HEADER_SIZE) + get_size(new_chunk));
         new_chunk = previousBlock;
         remove_header(new_chunk);
-        check_free_list_index(get_free_list_index(get_size(new_chunk)));
         int new_free_list_index = get_free_list_index(get_size(new_chunk));
         insert_header(new_chunk, new_free_list_index);
-        check_free_list_index(new_free_list_index);
       }
       else {
         set_size(lastFencePost,
@@ -394,7 +391,6 @@ static inline header * allocate_object(size_t raw_size) {
         lastFencePost = (header *) ((char *) lastFencePost + get_size(new_chunk));
         int new_free_list_index = get_free_list_index(get_size(new_chunk));
         insert_header(new_chunk, new_free_list_index);
-        check_free_list_index(free_list_index);
       }
     }
     else {
@@ -406,7 +402,6 @@ static inline header * allocate_object(size_t raw_size) {
       lastFencePost = (header *) ((char *) new_chunk + get_size(new_chunk));
       int new_free_list_index = get_free_list_index(get_size(new_chunk));
       insert_header(new_chunk, new_free_list_index);
-      check_free_list_index(new_free_list_index);
     }
 
     /* check if new size is big enough for the request: actual_size */
@@ -469,7 +464,6 @@ static inline void deallocate_object(void * p) {
       set_state(current, UNALLOCATED);
       int free_list_index = get_free_list_index(get_size(current));
       insert_header(current, free_list_index);
-      check_free_list_index(free_list_index);
   } else if (right_unallocated && !left_unallocated) {
 
       // Case 2: Only the right block is unallocated
@@ -494,7 +488,6 @@ static inline void deallocate_object(void * p) {
         new_right->left_size = new_size;
         int free_list_index = get_free_list_index(new_size);
         insert_header(current, free_list_index);
-        check_free_list_index(free_list_index);
       }
   } else if (!right_unallocated && left_unallocated) {
 
@@ -519,7 +512,6 @@ static inline void deallocate_object(void * p) {
         new_right->left_size = new_size;
         int free_list_index = get_free_list_index(new_size);
         insert_header(left, free_list_index);
-        check_free_list_index(free_list_index);
       }
   } else {
 
@@ -528,16 +520,13 @@ static inline void deallocate_object(void * p) {
      set_state(current, UNALLOCATED);
      size_t new_size = current_size + get_size(right) + get_size(left);
      remove_header(right);
-     check_free_list_index(get_free_list_index(get_size(right)));
      remove_header(left);
-     check_free_list_index(get_free_list_index(get_size(left)));
      set_state(left, UNALLOCATED);
      set_size(left, new_size);
      header *new_right = get_right_header(left);
      new_right->left_size = new_size;
      int free_list_index = get_free_list_index(new_size);
      insert_header(left, free_list_index);
-     check_free_list_index(free_list_index);
   }
 }
 
