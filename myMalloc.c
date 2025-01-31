@@ -909,7 +909,6 @@ void print_status(header * block) {
   clear_color();
 }
 
-/*
 static void print_bitmap() {
   printf("bitmap: [");
   for(int i = 0; i < N_LISTS; i++) {
@@ -924,7 +923,6 @@ static void print_bitmap() {
   }
   puts("]");
 }
-*/
 
 /**
  * @brief Print a linked list between two nodes using a provided print function
