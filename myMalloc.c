@@ -325,6 +325,7 @@ static inline header * allocate_object(size_t raw_size) {
       free_list_index = i;
       break;
     }
+    free_list_index++;
   }
 
 /*
