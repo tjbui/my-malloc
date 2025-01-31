@@ -86,7 +86,7 @@ static void init();
 static bool isMallocInitialized;
 
 /* extra credit bitmap */
-char freelist_bitmap[];
+char freelist_bitmap[59];
 
 /**
  * @brief Helper function to retrieve a header pointer from a pointer and an 
