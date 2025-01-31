@@ -301,9 +301,12 @@ static inline header * allocate_object(size_t raw_size) {
   }
   size_t actual_size = calculate_actual_size(raw_size);
   int free_list_index = get_free_list_index(actual_size);
+
+  /* bitmap optimization */
 /*
   for (int i = 0; i < N_LISTS - 1; i++) {
     if (freelist_bitmap[i] == 1) {
+      free_list_index = i;
       break;
     }
   }
@@ -314,6 +317,8 @@ static inline header * allocate_object(size_t raw_size) {
     free_list_index++;
   }
  
+
+
   /* If free_list_index isn't the last index, set the block to allocated and
      return the block's data pointer. If it is the last index, traverse the last
      linked list */
@@ -665,13 +670,13 @@ void * my_malloc(size_t size) {
   pthread_mutex_lock(&mutex);
 
 /* new */
-
+/*
   if (!isMallocInitialized) {
     isMallocInitialized = 1;
     init();
 
   }
-
+*/
 /* new */
 
   header * hdr = allocate_object(size);
