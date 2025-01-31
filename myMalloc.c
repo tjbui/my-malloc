@@ -252,7 +252,7 @@ static void insert_header(header * remaining_block, int new_free_list_index) {
   remaining_block->next = new_sentinel->next; 
   remaining_block->prev = new_sentinel; 
   new_sentinel -> next = remaining_block;
-  check_free_list_index(new_free_list_idex);
+  check_free_list_index(new_free_list_index);
 }
 
 /* helper function to split */
@@ -319,20 +319,20 @@ static inline header * allocate_object(size_t raw_size) {
   int free_list_index = get_free_list_index(actual_size);
 
   /* bitmap optimization */
-/*
+
   for (int i = 0; i < N_LISTS - 1; i++) {
     if (freelist_bitmap[i] == 1) {
       free_list_index = i;
       break;
     }
   }
-*/
 
+/*
   while ((freelistSentinels[free_list_index].next == &freelistSentinels[free_list_index])
           && (free_list_index < (N_LISTS - 1))) {
     free_list_index++;
   }
- 
+ */
 
 
   /* If free_list_index isn't the last index, set the block to allocated and
