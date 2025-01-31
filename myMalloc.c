@@ -280,6 +280,7 @@ static header * split_if_necessary(header * current, size_t actual_size, int fre
           
           check_free_list_index(get_free_list_index(get_size(remaining_block)));
           check_free_list_index(current_index);
+          check_free_list_index(current_index - 1);
 
           header *right_block = get_right_header(allocated_block);
           if (get_size(right_block) != 0) {
