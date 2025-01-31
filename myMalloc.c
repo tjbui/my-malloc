@@ -362,6 +362,7 @@ static inline header * allocate_object(size_t raw_size) {
   
   while (true) {
     header * new_chunk = allocate_chunk(ARENA_SIZE);
+    check_free_list_index(get_free_list_index(get_size(new_chunk)));
     if (new_chunk == NULL) {
       return NULL;
     }
