@@ -83,6 +83,7 @@ void* pvalloc(size_t size);
 
 static void init();
 
+void print_hello();
 static bool isMallocInitialized;
 
 /* extra credit bitmap */
