@@ -71,7 +71,7 @@ static inline header * allocate_object(size_t raw_size);
 // valid
 static inline header * detect_cycles();
 static inline header * verify_pointers();
-static inline bool verify_freelist();
+//static inline bool verify_freelist();
 static inline header * verify_chunk(header * chunk);
 static inline bool verify_tags();
 
@@ -592,6 +592,7 @@ static inline header * verify_pointers() {
  *
  * @return true if the list is valid
  */
+/*
 static inline bool verify_freelist() {
   header * cycle = detect_cycles();
   if (cycle != NULL) {
@@ -609,7 +610,7 @@ static inline bool verify_freelist() {
 
   return true;
 }
-
+*/
 /**
  * @brief Helper to verify that the sizes in a chunk from the OS are correct
  *        and that allocated node's canary values are correct
@@ -695,17 +696,17 @@ static void init() {
 /* 
  * External interface
  */
-void * my_malloc(size_t size) {
+void * malloc(size_t size) {
   pthread_mutex_lock(&mutex);
 
 /* new */
-/*
+
   if (!isMallocInitialized) {
     isMallocInitialized = 1;
     init();
 
   }
-*/
+
 /* new */
 
   header * hdr = allocate_object(size);
@@ -718,11 +719,11 @@ void * my_malloc(size_t size) {
   return data;
 }
 
-void * my_calloc(size_t nmemb, size_t size) {
+void * calloc(size_t nmemb, size_t size) {
   return memset(my_malloc(size * nmemb), 0, size * nmemb);
 }
 
-void * my_realloc(void * ptr, size_t size) {
+void * realloc(void * ptr, size_t size) {
 
   header * chunk = ptr - (2 * sizeof(size_t));
   size_t old_chunk_size = get_size(chunk);
@@ -755,15 +756,17 @@ void * my_realloc(void * ptr, size_t size) {
   }
 }
 
-void my_free(void * p) {
+void free(void * p) {
   pthread_mutex_lock(&mutex);
   deallocate_object(p);
   pthread_mutex_unlock(&mutex);
 }
 
+/*
 bool verify() {
   return verify_freelist() && verify_tags();
 }
+*/
 
 /**
  * @brief Print just the block's size
@@ -1021,4 +1024,8 @@ void* pvalloc(size_t size) {
     // Round size up to the nearest multiple of page size
     // Call memalign() with page size alignment
     // Return pointer to allocated memory or NULL on failure
+}
+
+void print_hello() {
+  printf("hello");
 }
