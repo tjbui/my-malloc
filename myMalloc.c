@@ -89,6 +89,13 @@ static bool isMallocInitialized;
 /* extra credit bitmap */
 char freelist_bitmap[59];
 
+
+
+void print_hello() {
+  printf("hello");
+}
+
+
 /**
  * @brief Helper function to retrieve a header pointer from a pointer and an 
  *        offset
@@ -1027,6 +1034,3 @@ void* pvalloc(size_t size) {
     // Return pointer to allocated memory or NULL on failure
 }
 
-void print_hello() {
-  printf("hello");
-}
