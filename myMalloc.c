@@ -71,7 +71,7 @@ static inline header * allocate_object(size_t raw_size);
 // valid
 static inline header * detect_cycles();
 static inline header * verify_pointers();
-//static inline bool verify_freelist();
+static inline bool verify_freelist();
 static inline header * verify_chunk(header * chunk);
 static inline bool verify_tags();
 
@@ -83,18 +83,10 @@ void* pvalloc(size_t size);
 
 static void init();
 
-void print_hello();
 static bool isMallocInitialized;
 
 /* extra credit bitmap */
 char freelist_bitmap[59];
-
-
-
-void print_hello() {
-  printf("hello");
-}
-
 
 /**
  * @brief Helper function to retrieve a header pointer from a pointer and an 
@@ -600,7 +592,6 @@ static inline header * verify_pointers() {
  *
  * @return true if the list is valid
  */
-/*
 static inline bool verify_freelist() {
   header * cycle = detect_cycles();
   if (cycle != NULL) {
@@ -618,7 +609,7 @@ static inline bool verify_freelist() {
 
   return true;
 }
-*/
+
 /**
  * @brief Helper to verify that the sizes in a chunk from the OS are correct
  *        and that allocated node's canary values are correct
@@ -704,17 +695,17 @@ static void init() {
 /* 
  * External interface
  */
-void * malloc(size_t size) {
+void * my_malloc(size_t size) {
   pthread_mutex_lock(&mutex);
 
 /* new */
-
+/*
   if (!isMallocInitialized) {
     isMallocInitialized = 1;
     init();
 
   }
-
+*/
 /* new */
 
   header * hdr = allocate_object(size);
@@ -727,11 +718,11 @@ void * malloc(size_t size) {
   return data;
 }
 
-void * calloc(size_t nmemb, size_t size) {
+void * my_calloc(size_t nmemb, size_t size) {
   return memset(my_malloc(size * nmemb), 0, size * nmemb);
 }
 
-void * realloc(void * ptr, size_t size) {
+void * my_realloc(void * ptr, size_t size) {
 
   header * chunk = ptr - (2 * sizeof(size_t));
   size_t old_chunk_size = get_size(chunk);
@@ -764,17 +755,15 @@ void * realloc(void * ptr, size_t size) {
   }
 }
 
-void free(void * p) {
+void my_free(void * p) {
   pthread_mutex_lock(&mutex);
   deallocate_object(p);
   pthread_mutex_unlock(&mutex);
 }
 
-/*
 bool verify() {
   return verify_freelist() && verify_tags();
 }
-*/
 
 /**
  * @brief Print just the block's size
@@ -1033,4 +1022,3 @@ void* pvalloc(size_t size) {
     // Call memalign() with page size alignment
     // Return pointer to allocated memory or NULL on failure
 }
-
