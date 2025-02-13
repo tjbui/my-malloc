@@ -736,8 +736,8 @@ void * my_realloc(void * ptr, size_t size) {
   size_t new_size = calculate_actual_size(size);
 
   if (get_size(chunk) > size) {
+    header * right_of_right = get_right_header(chunk);
     set_size(chunk, new_size);
-    header * right_of_right = get_right_header(new_right);
     right_of_right -> left_size = new_size;
     return ptr;
   }  
