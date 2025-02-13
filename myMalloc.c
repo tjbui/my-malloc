@@ -736,7 +736,7 @@ void * my_realloc(void * ptr, size_t size) {
   size_t new_size = calculate_actual_size(size);
   if (get_size(chunk) > size) {
     set_size(chunk, new_size);
-    return mem;
+    return ptr;
   }  
 
   if ((get_state(right) == UNALLOCATED) && ((get_size(chunk) + get_size(right)) >= new_size)) {
