@@ -740,7 +740,7 @@ void * my_realloc(void * ptr, size_t size) {
     header * new_right = (header *) ((char *) chunk + new_size);
     new_right -> left_size = new_size;
     set_size(chunk, new_size);
-    right_of_right -> left_size = new_size;
+    right_of_right -> left_size = get_size(new_right);
     return ptr;
   }  
 
