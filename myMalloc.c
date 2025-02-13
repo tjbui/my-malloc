@@ -724,6 +724,12 @@ void * my_calloc(size_t nmemb, size_t size) {
 
 void * my_realloc(void * ptr, size_t size) {
 
+  if (ptr == NULL) {
+    return NULL;
+  }
+  if (size < 0) {
+    return NULL;
+  }  
   header * chunk = ptr - (2 * sizeof(size_t));
   size_t old_chunk_size = get_size(chunk);
   header * right = get_right_header(chunk);

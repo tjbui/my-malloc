@@ -8,7 +8,7 @@ MALLOC_FILES = ../myMalloc.c ../testing.c
 MALLOC_HEADERS = ../myMalloc.h ../testing.h 
 
 .PHONY: all
-all: git-commit simple malloc free robustness other test_realloc
+all: git-commit simple malloc free robustness other test_realloc test_realloc_null
 
 .PHONY: git-commit
 git-commit:
