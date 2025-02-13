@@ -735,7 +735,8 @@ void * my_realloc(void * ptr, size_t size) {
   header * right = get_right_header(chunk);
   size_t new_size = calculate_actual_size(size);
   
-  if ((get_state(right) == UNALLOCATED) && ((get_size(chunk) + get_size(right)) >= new_size) || get_size(chunk > new_size)) {
+  if ((get_state(right) == UNALLOCATED) && ((get_size(chunk) + get_size(right)) >= new_size) ||
+       (get_size(chunk) > new_size)) {
     set_size(chunk, new_size);
     header * new_right = (header *) ((char *) chunk + new_size);
     set_size(new_right, get_size(right) - (new_size - old_chunk_size));
