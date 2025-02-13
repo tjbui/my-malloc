@@ -8,7 +8,7 @@ MALLOC_FILES = ../myMalloc.c ../testing.c
 MALLOC_HEADERS = ../myMalloc.h ../testing.h 
 
 .PHONY: all
-all: git-commit simple malloc free robustness other test_realloc test_realloc_null test_realloc_nosplit test_realloc_no_opt
+all: git-commit simple malloc free robustness other test_realloc_null test_realloc_nosplit test_realloc_no_opt test_realloc_shrink
 
 .PHONY: git-commit
 git-commit:
@@ -134,6 +134,8 @@ test_realloc_null: ${TEST_SRC_DIR}/test_realloc_null.c ${MALLOC_FILES} ${MALLOC_
 test_realloc_no_opt: ${TEST_SRC_DIR}/test_realloc_no_opt.c ${MALLOC_FILES} ${MALLOC_HEADERS}
 	${CC} ${CFLAGS} ${LDFLAGS} -DARENA_SIZE=1024 -o ${TEST_BIN_DIR}/$@ ${TEST_SRC_DIR}/$@.c ${MALLOC_FILES}
 
+test_realloc_shrink: ${TEST_SRC_DIR}/test_realloc_shrink.c ${MALLOC_FILES} ${MALLOC_HEADERS}
+	${CC} ${CFLAGS} ${LDFLAGS} -DARENA_SIZE=1024 -o ${TEST_BIN_DIR}/$@ ${TEST_SRC_DIR}/$@.c ${MALLOC_FILES}
 
 test_all_lists: ${TEST_SRC_DIR}/test_all_lists.c ${MALLOC_FILES} ${MALLOC_HEADERS}
 	${CC} ${CFLAGS} ${LDFLAGS} -DARENA_SIZE=2147483648 -o ${TEST_BIN_DIR}/$@ ${TEST_SRC_DIR}/$@.c ${MALLOC_FILES}
