@@ -128,6 +128,9 @@ test_out_of_ram: ${TEST_SRC_DIR}/test_out_of_ram.c ${MALLOC_FILES} ${MALLOC_HEAD
 test_realloc: ${TEST_SRC_DIR}/test_realloc.c ${MALLOC_FILES} ${MALLOC_HEADERS}
 	${CC} ${CFLAGS} ${LDFLAGS} -DARENA_SIZE=1024 -o ${TEST_BIN_DIR}/$@ ${TEST_SRC_DIR}/$@.c ${MALLOC_FILES}
 
+test_realloc_null: ${TEST_SRC_DIR}/test_realloc_null.c ${MALLOC_FILES} ${MALLOC_HEADERS}
+	${CC} ${CFLAGS} ${LDFLAGS} -DARENA_SIZE=1024 -o ${TEST_BIN_DIR}/$@ ${TEST_SRC_DIR}/$@.c ${MALLOC_FILES}
+
 test_all_lists: ${TEST_SRC_DIR}/test_all_lists.c ${MALLOC_FILES} ${MALLOC_HEADERS}
 	${CC} ${CFLAGS} ${LDFLAGS} -DARENA_SIZE=2147483648 -o ${TEST_BIN_DIR}/$@ ${TEST_SRC_DIR}/$@.c ${MALLOC_FILES}
 
