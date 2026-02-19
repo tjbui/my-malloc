@@ -351,14 +351,6 @@ static inline header * allocate_object(size_t raw_size) {
     free_list_index++;
   }
 
-/*
-  while ((freelistSentinels[free_list_index].next == &freelistSentinels[free_list_index])
-          && (free_list_index < (N_LISTS - 1))) {
-    free_list_index++;
-  }
- */
-
-
   /* If free_list_index isn't the last index, set the block to allocated and
      return the block's data pointer. If it is the last index, traverse the last
      linked list */
@@ -451,9 +443,6 @@ static inline header * allocate_object(size_t raw_size) {
 static inline header * ptr_to_header(void * p) {
   return (header *)((char *) p - ALLOC_HEADER_SIZE); //sizeof(header));
 }
-
-/* */
-
 
 /**
  * @brief Helper to manage deallocation of a pointer returned by the user
@@ -558,8 +547,6 @@ static inline void deallocate_object(void * p) {
   }
 }
 
-
-
 /**
  * @brief Helper to detect cycles in the free list
  * https://en.wikipedia.org/wiki/Cycle_detection#Floyd's_Tortoise_and_Hare
@@ -605,25 +592,7 @@ static inline header * verify_pointers() {
  *
  * @return true if the list is valid
  */
-/*
-static inline bool verify_freelist() {
-  header * cycle = detect_cycles();
-  if (cycle != NULL) {
-    fprintf(stderr, "Cycle Detected\n");
-    print_sublist(print_object, cycle->next, cycle);
-    return false;
-  }
 
-  header * invalid = verify_pointers();
-  if (invalid != NULL) {
-    fprintf(stderr, "Invalid pointers\n");
-    print_object(invalid);
-    return false;
-  }
-
-  return true;
-}
-*/
 /**
  * @brief Helper to verify that the sizes in a chunk from the OS are correct
  *        and that allocated node's canary values are correct
@@ -712,15 +681,11 @@ static void init() {
 void * malloc(size_t size) {
   pthread_mutex_lock(&mutex);
 
-/* new */
-
   if (!isMallocInitialized) {
     isMallocInitialized = 1;
     init();
 
   }
-
-/* new */
 
   header * hdr = allocate_object(size);
   if (hdr == NULL) {
@@ -768,11 +733,6 @@ void free(void * p) {
   pthread_mutex_unlock(&mutex);
 }
 
-/*
-bool verify() {
-  return verify_freelist() && verify_tags();
-}
-*/
 
 /**
  * @brief Print just the block's size
@@ -929,21 +889,6 @@ void print_status(header * block) {
   clear_color();
 }
 
-static void print_bitmap() {
-  printf("bitmap: [");
-  for(int i = 0; i < N_LISTS; i++) {
-    if ((freelist_bitmap[i >> 3] >> (i & 7)) & 1) {
-      printf("\033[32m#\033[0m");
-    } else {
-      printf("\033[34m_\033[0m");
-    }
-    if (i % 8 == 7) {
-      printf(" ");
-    }
-  }
-  puts("]");
-}
-
 /**
  * @brief Print a linked list between two nodes using a provided print function
  *
@@ -999,36 +944,5 @@ void tags_print(printFormatter pf) {
     pf(chunk);
     fflush(stdout);
   }
-}
-
-/* extra credit */
-
-// Function 1: memalign()
-void* memalign(size_t alignment, size_t size) {
-    // Ensure alignment is a power of 2 and greater than or equal to sizeof(void*)
-    // Allocate memory with the specified alignment
-    // Return pointer to the allocated memory or NULL on failure
-}
-
-// Function 2: valloc()
-void* valloc(size_t size) {
-    // Get the system page size
-    // Call memalign() with page size alignment
-    // Return pointer to allocated memory or NULL on failure
-}
-
-// Function 3: posix_memalign()
-int posix_memalign(void** ptr, size_t alignment, size_t size) {
-    // Ensure alignment is a power of 2 and a multiple of sizeof(void*)
-    // Allocate aligned memory and store the pointer in *ptr
-    // Return 0 on success or an error code on failure
-}
-
-// Function 4: pvalloc()
-void* pvalloc(size_t size) {
-    // Get the system page size
-    // Round size up to the nearest multiple of page size
-    // Call memalign() with page size alignment
-    // Return pointer to allocated memory or NULL on failure
 }
 
