@@ -10,3 +10,8 @@ Realloc:
 
 LD_PRELOAD
   - I am able to run hello.c with loading my malloc implementation as a shared library 
+
+Usage:
+$ gcc -shared -fPIC -o libmymalloc.so myMalloc_sharedlib.c -ldl -pthread
+$ LD_PRELOAD=./libmymalloc.so /bin/echo hello
+$ LD_PRELOAD=./libmymalloc.so touch hello.txt

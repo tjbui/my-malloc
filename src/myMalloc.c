@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <assert.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #include "myMalloc.h"
 
@@ -19,8 +20,7 @@ static bool use_color;
 /*
  * Mutex to ensure thread safety for the freelist
  */
-static pthread_mutex_t mutex;
-
+static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 /*
  * Array of sentinel nodes for the freelists
  */
@@ -71,7 +71,7 @@ static inline header * allocate_object(size_t raw_size);
 // valid
 static inline header * detect_cycles();
 static inline header * verify_pointers();
-static inline bool verify_freelist();
+//static inline bool verify_freelist();
 static inline header * verify_chunk(header * chunk);
 static inline bool verify_tags();
 
@@ -83,10 +83,18 @@ void* pvalloc(size_t size);
 
 static void init();
 
+void print_hello();
 static bool isMallocInitialized;
 
 /* extra credit bitmap */
 char freelist_bitmap[59];
+
+
+
+void print_hello() {
+  printf("hello");
+}
+
 
 /**
  * @brief Helper function to retrieve a header pointer from a pointer and an 
@@ -179,6 +187,10 @@ inline static void insert_fenceposts(void * raw_mem, size_t size) {
  */
 static header * allocate_chunk(size_t size) {
   void * mem = sbrk(size);
+  if (mem == (void *) -1) {
+    // sbrk failed – return NULL so caller can handle
+    return NULL;
+  }
   insert_fenceposts(mem, size);
   header * hdr = (header *) ((char *)mem + ALLOC_HEADER_SIZE);
   set_state(hdr, UNALLOCATED);
@@ -279,8 +291,8 @@ static header * split_if_necessary(header * current, size_t actual_size, int fre
           set_state(allocated_block, ALLOCATED);
 
 
-          remove_header(allocated_block);
-          //remove_header(current);         
+          //remove_header(allocated_block); // 11/16 TJ COMMENTING THIS OUT
+          remove_header(current);       // 1116 TJ UNCOMMENTING THIS   
  
           header *right_block = get_right_header(allocated_block);
           if (get_size(right_block) != 0) {
@@ -373,10 +385,11 @@ static inline header * allocate_object(size_t raw_size) {
   
   while (true) {
     header * new_chunk = allocate_chunk(ARENA_SIZE);
-    check_free_list_index(get_free_list_index(get_size(new_chunk)));
     if (new_chunk == NULL) {
       return NULL;
     }
+    check_free_list_index(get_free_list_index(get_size(new_chunk)));
+
     header *fenceBeforeChunk = (header *)((char *)new_chunk - (2 * ALLOC_HEADER_SIZE));
 
     /* check if lastFencePost is next to new chunk and coalesce if necessary */
@@ -592,6 +605,7 @@ static inline header * verify_pointers() {
  *
  * @return true if the list is valid
  */
+/*
 static inline bool verify_freelist() {
   header * cycle = detect_cycles();
   if (cycle != NULL) {
@@ -609,7 +623,7 @@ static inline bool verify_freelist() {
 
   return true;
 }
-
+*/
 /**
  * @brief Helper to verify that the sizes in a chunk from the OS are correct
  *        and that allocated node's canary values are correct
@@ -695,90 +709,70 @@ static void init() {
 /* 
  * External interface
  */
-void * my_malloc(size_t size) {
+void * malloc(size_t size) {
   pthread_mutex_lock(&mutex);
 
 /* new */
-/*
+
   if (!isMallocInitialized) {
     isMallocInitialized = 1;
     init();
 
   }
-*/
+
 /* new */
 
   header * hdr = allocate_object(size);
+  if (hdr == NULL) {
+    pthread_mutex_unlock(&mutex);
+    return NULL;  // out of memory
+  }
   void * data = hdr -> data; 
   pthread_mutex_unlock(&mutex);
     
-  if (hdr == NULL) {
-    return NULL;
-  }
   return data;
 }
 
-void * my_calloc(size_t nmemb, size_t size) {
-  return memset(my_malloc(size * nmemb), 0, size * nmemb);
-}
-
-void * my_realloc(void * ptr, size_t size) {
-
-  if (ptr == NULL) {
+void *calloc(size_t nmemb, size_t size) {
+  if (nmemb != 0 && size > SIZE_MAX / nmemb) {
+    errno = ENOMEM;
     return NULL;
   }
-  if (size < 0) {
-    return NULL;
-  }  
-  header * chunk = ptr - (2 * sizeof(size_t));
-  size_t old_chunk_size = get_size(chunk);
-  header * right = get_right_header(chunk);
-  size_t new_size = calculate_actual_size(size);
-
-  if (get_size(chunk) > new_size) {
-    set_size(chunk, new_size);
-    header * new_right = (header *) ((char *) chunk + new_size);
-    new_right -> left_size = new_size;
-    header *right_of_right = get_right_header(new_right);
-    right_of_right -> left_size = get_size(new_right);
-    return ptr;
-  }  
-
-  if ((get_state(right) == UNALLOCATED) && ((get_size(chunk) + get_size(right)) >= new_size)) {
-    set_size(chunk, new_size);
-    header * new_right = (header *) ((char *) chunk + new_size);
-    set_size(new_right, get_size(right) - (new_size - old_chunk_size));
-    new_right -> left_size = new_size;
-    
-    /* set right of right header */
-
-    header * right_of_right = get_right_header(new_right);
-    right_of_right -> left_size = get_size(new_right);
-       
-    /* fix free list */
-
-    remove_header(right);
-    insert_header(new_right, get_free_list_index(get_size(new_right)));  
-    return ptr;
-  }
-  else {
-    void * mem = my_malloc(size);
-    memcpy(mem, ptr, size);
-    my_free(ptr);
-    return mem;
-
-  }
+  size_t total = nmemb * size;
+  void *p = malloc(total);
+  if (!p) return NULL;
+  memset(p, 0, total);
+  return p;
 }
 
-void my_free(void * p) {
+void *realloc(void *ptr, size_t size) {
+  if (ptr == NULL) return malloc(size);
+  if (size == 0) { free(ptr); return NULL; }
+
+  header *h = ptr_to_header(ptr);
+  size_t old_total = get_size(h);
+  size_t old_payload = old_total - ALLOC_HEADER_SIZE;
+
+  void *newp = malloc(size);
+  if (!newp) return NULL;
+
+  size_t copy = (size < old_payload) ? size : old_payload;
+  memcpy(newp, ptr, copy);
+  free(ptr);
+  return newp;
+}
+
+void free(void * p) {
   pthread_mutex_lock(&mutex);
   deallocate_object(p);
   pthread_mutex_unlock(&mutex);
 }
 
+/*
 bool verify() {
   return verify_freelist() && verify_tags();
 }
+*/
 
 /**
  * @brief Print just the block's size
@@ -1037,3 +1031,4 @@ void* pvalloc(size_t size) {
     // Call memalign() with page size alignment
     // Return pointer to allocated memory or NULL on failure
 }
+

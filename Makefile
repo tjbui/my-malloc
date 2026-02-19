@@ -1,26 +1,18 @@
-.PHONY: all
-all: examples realloc
+CC = gcc
 
-#.PHONY: git-commit
-#git-commit:
-#	git checkout master >> .local.git.out || echo
-#	git add *.c Makefile >> .local.git.out  || echo
-#	git commit -a -m 'Commit' >> .local.git.out || echo
-#	git push origin master
+CFLAGS = -Wall -Wextra -O2 -fPIC -Isrc
+LDFLAGS = -shared
+LIBS = -ldl -pthread
 
-.PHONY: tests
-tests:
-	$(MAKE) -C tests
+TARGET = libmymalloc.so
+SRC = src/myMalloc.c
 
-.PHONY: examples
-examples:
-	$(MAKE) -C examples
+.PHONY: all clean
 
-.PHONY: test
-test: tests
-	python ./runtest.py
+all: $(TARGET)
 
-.PHONY: clean
-clean: 
-	$(MAKE) -C tests clean
-	$(MAKE) -C examples clean
+$(TARGET): $(SRC)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
+
+clean:
+	rm -f $(TARGET)
