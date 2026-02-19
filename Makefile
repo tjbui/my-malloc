@@ -1,5 +1,5 @@
 .PHONY: all
-all: tests examples realloc
+all: examples realloc
 
 #.PHONY: git-commit
 #git-commit:
