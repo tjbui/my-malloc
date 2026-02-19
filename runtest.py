@@ -84,7 +84,7 @@ def runSuite(name, suite, verbose, indentby):
     for test in suite:
         totalPoints += test[1];
     indent(indentby)
-    print(blue('SUITE: ' + name + ' ' + str(totalPoints) + ' pts'));
+    print(blue('SUITE: ' + name));
     for test in suite:
         if (runTest(test[0], test[1], verbose, indentby + 1)):
             pointsEarned+=test[1];
@@ -94,7 +94,6 @@ def runSuite(name, suite, verbose, indentby):
         fmtColor = green;
     else:
         fmtColor = red;
-    print(fmtColor('Subtotal: ' + str(pointsEarned) + '/' + str(totalPoints)));
     print();
 
     return (pointsEarned, totalPoints);
@@ -131,10 +130,6 @@ if (pointsEarned == totalPoints):
     fmtColor = green;
 else:
     fmtColor = red;
-print(fmtColor('\nTotal: ' + str(pointsEarned) + '/' + str(totalPoints)));
-
-print('\nNOTE:\n' +
-      'Additional tests worth an additional 10 points will be used for the final grading');
 
 if (len(sys.argv) == 2 and sys.argv[1] == 'all'):
     print();

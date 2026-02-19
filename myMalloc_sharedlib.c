@@ -187,6 +187,10 @@ inline static void insert_fenceposts(void * raw_mem, size_t size) {
  */
 static header * allocate_chunk(size_t size) {
   void * mem = sbrk(size);
+  if (mem == (void *) -1) {
+    // sbrk failed – return NULL so caller can handle
+    return NULL;
+  }
   insert_fenceposts(mem, size);
   header * hdr = (header *) ((char *)mem + ALLOC_HEADER_SIZE);
   set_state(hdr, UNALLOCATED);
@@ -287,8 +291,8 @@ static header * split_if_necessary(header * current, size_t actual_size, int fre
           set_state(allocated_block, ALLOCATED);
 
 
-          remove_header(allocated_block);
-          //remove_header(current);         
+          //remove_header(allocated_block); // 11/16 TJ COMMENTING THIS OUT
+          remove_header(current);       // 1116 TJ UNCOMMENTING THIS   
  
           header *right_block = get_right_header(allocated_block);
           if (get_size(right_block) != 0) {
@@ -381,10 +385,11 @@ static inline header * allocate_object(size_t raw_size) {
   
   while (true) {
     header * new_chunk = allocate_chunk(ARENA_SIZE);
-    check_free_list_index(get_free_list_index(get_size(new_chunk)));
     if (new_chunk == NULL) {
       return NULL;
     }
+    check_free_list_index(get_free_list_index(get_size(new_chunk)));
+
     header *fenceBeforeChunk = (header *)((char *)new_chunk - (2 * ALLOC_HEADER_SIZE));
 
     /* check if lastFencePost is next to new chunk and coalesce if necessary */
@@ -718,20 +723,28 @@ void * malloc(size_t size) {
 /* new */
 
   header * hdr = allocate_object(size);
+  if (hdr == NULL) {
+    pthread_mutex_unlock(&mutex);
+    return NULL;  // out of memory
+  }
   void * data = hdr -> data; 
   pthread_mutex_unlock(&mutex);
     
-  if (hdr == NULL) {
-    return NULL;
-  }
   return data;
 }
 
 void * calloc(size_t nmemb, size_t size) {
-  return memset(my_malloc(size * nmemb), 0, size * nmemb);
+  return memset(malloc(size * nmemb), 0, size * nmemb);
 }
 
 void * realloc(void * ptr, size_t size) {
+
+  if (ptr == NULL) {
+    return NULL;
+  }
+  if (size < 0) {
+    return NULL;
+  } 
 
   header * chunk = ptr - (2 * sizeof(size_t));
   size_t old_chunk_size = get_size(chunk);
@@ -756,9 +769,9 @@ void * realloc(void * ptr, size_t size) {
     return ptr;
   }
   else {
-    void * mem = my_malloc(size);
+    void * mem = malloc(size);
     memcpy(mem, ptr, size);
-    my_free(ptr);
+    free(ptr);
     return mem;
 
   }
