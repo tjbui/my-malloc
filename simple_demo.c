@@ -7,4 +7,5 @@ int main() {
   *ptr = x;
 
   printf("*ptr: %d\n", *ptr);
+  free(ptr);
 }

@@ -1,17 +1,39 @@
-Bitmap Implementation:
-  - Use bitmap to track which freelists currently have an unallocated block. This optimizes the runtime because it is faster to iterate through the bitmap than to iterate through the freelistSentinels[].
+my_malloc
+=========
+
+A custom malloc implementation (segregated free lists + boundary tags) that can
+replace the system allocator via LD_PRELOAD.
+
+Build
+-----
+  $ make            # build libmymalloc.so
+  $ make test       # build and run the test suite
+  $ make clean      # remove build artifacts
+
+Tests
+-----
+  Each test in tests/tests_src is compiled into its own executable in
+  tests/tests_executables. `tests/testall` runs them all and reports pass/fail.
+  Run an individual executable directly to see its heap output.
+
+Notes
+-----
+Bitmap:
+  - A bitmap tracks which free lists currently hold an unallocated block. This
+    is faster than scanning freelistSentinels[] directly.
 
 Realloc:
-  - Created test_realloc.c in the tests/testsrc directory. Modified Makefile to compile upon make
-  - test_realloc.c allocates two chunks of memory and frees the chunk of memory on the right. Then, it calls realloc()
-  - Without optimization, realloc() will free the original pointer and call myMalloc.c to create a new chunk of memory and use memcpy() to copy the original pointer. Thus, without optimization, the pointer after the realloc() call will be DIFFERENT from the pointer before the realloc() call
-  - With optimization, if the right chunk is free and big enough to satisfy the realloc() request, memcpy() will not be called and instead, the chunk will extend in place. Thus, with optimizations, the pointer after the realloc() call will be the SAME from the pointer before the realloc() call. 
-  - As shown from running the executable /tests/test_realloc, the pointer stays in the same place so the implenentation is correct
+  - realloc() frees the original pointer, allocates a new block, and copies the
+    data over with memcpy(), returning the new pointer.
 
-LD_PRELOAD
-  - I am able to run hello.c with loading my malloc implementation as a shared library 
+LD_PRELOAD:
+  - The allocator can be preloaded so any program uses it instead of the system
+    malloc. Verified on simple commands (ls, pwd, echo, touch) and heavier
+    programs (curl, w3m fetching a web page).
 
-Usage:
-$ gcc -shared -fPIC -o libmymalloc.so myMalloc_sharedlib.c -ldl -pthread
-$ LD_PRELOAD=./libmymalloc.so /bin/echo hello
-$ LD_PRELOAD=./libmymalloc.so touch hello.txt
+Usage
+-----
+  $ gcc -shared -fPIC -o libmymalloc.so src/myMalloc.c -pthread
+  $ LD_PRELOAD=./libmymalloc.so /bin/echo hello
+  $ LD_PRELOAD=./libmymalloc.so touch hello.txt
+  $ LD_PRELOAD=./libmymalloc.so curl -sL google.com

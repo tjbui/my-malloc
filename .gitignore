@@ -1,0 +1,9 @@
+# Compiled test executables and the aggregate runner
+tests/tests_executables/
+tests/testall
+
+# Object files
+*.o
+
+# Local demo binaries
+/simple

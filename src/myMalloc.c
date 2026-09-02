@@ -273,54 +273,47 @@ static void insert_header(header * remaining_block, int new_free_list_index) {
 
 static header * split_if_necessary(header * current, size_t actual_size, int free_list_index) {
 
-        // Split if necessary. Update size and left size fields of 
-        //   neighboring block. Update allocation state of allcoated 
-        //   block to ALLOCATED. Return data pointer 
-        int current_index = get_free_list_index(get_size(current));
-        
-        if (get_size(current) >= actual_size + sizeof(header)) {
+        // Split if necessary. Update size and left size fields of
+        //   neighboring block. Update allocation state of allocated
+        //   block to ALLOCATED. Return the allocated header.
+        size_t orig_size = get_size(current);
 
-          // update remaining, left, and allocated blocks 
+        if (orig_size >= actual_size + sizeof(header)) {
 
-          header *remaining_block = current;
-          set_size(remaining_block, get_size(current) - actual_size);
-          set_state(remaining_block, UNALLOCATED);
-          header *allocated_block = (header *) get_right_header(remaining_block);
-          set_size(allocated_block, actual_size);
-          allocated_block -> left_size = get_size(remaining_block);
-          set_state(allocated_block, ALLOCATED);
+          // Keep the left part ('current') free, carve the allocated block
+          // out of the right side so the free remainder keeps its address.
+          int orig_index = get_free_list_index(orig_size);
+          size_t remaining_size = orig_size - actual_size;
+          int new_index = get_free_list_index(remaining_size);
 
-
-          //remove_header(allocated_block); // 11/16 TJ COMMENTING THIS OUT
-          remove_header(current);       // 1116 TJ UNCOMMENTING THIS   
- 
-          header *right_block = get_right_header(allocated_block);
-          if (get_size(right_block) != 0) {
-            right_block->left_size = get_size(allocated_block);
-          }
-
-          // remaining_block needs to be placed in correct free list 
-
-          int new_free_list_index = get_free_list_index(get_size(remaining_block));
-          if (new_free_list_index == free_list_index) {
-            return allocated_block;
-          }
-          else {
+          // Resize the free remainder, moving it to another list only if its
+          // size class changed. The remove MUST happen before the resize so
+          // that remove_header updates the bitmap bit for the ORIGINAL list
+          // (it derives the list index from the block's current size).
+          if (new_index != orig_index) {
             remove_header(current);
-            insert_header(remaining_block, new_free_list_index);
-
-            check_free_list_index(get_free_list_index(get_size(remaining_block)));
-            check_free_list_index(current_index);
-
-            return allocated_block;
+            set_size(current, remaining_size);   // state stays UNALLOCATED
+            insert_header(current, new_index);
+          } else {
+            set_size(current, remaining_size);
           }
+
+          header *allocated_block = get_right_header(current);
+          set_size(allocated_block, actual_size);
+          set_state(allocated_block, ALLOCATED);
+          allocated_block->left_size = remaining_size;
+
+          // Fix the left_size of whatever sits to the right (block or fencepost)
+          header *right_block = get_right_header(allocated_block);
+          right_block->left_size = actual_size;
+
+          return allocated_block;
         }
         else {
-              
-          // If block is large enough to fulfill request, but not split 
 
-          set_state(current, ALLOCATED);
+          // Large enough to fulfill the request but not to split: use it whole.
           remove_header(current);
+          set_state(current, ALLOCATED);
           return current;
         }
 }
@@ -380,49 +373,48 @@ static inline header * allocate_object(size_t raw_size) {
     if (new_chunk == NULL) {
       return NULL;
     }
-    check_free_list_index(get_free_list_index(get_size(new_chunk)));
-
+    // The new chunk's right fencepost is the heap's new end in every case.
+    header *rightFence = get_right_header(new_chunk);
     header *fenceBeforeChunk = (header *)((char *)new_chunk - (2 * ALLOC_HEADER_SIZE));
 
     /* check if lastFencePost is next to new chunk and coalesce if necessary */
 
     if (fenceBeforeChunk == lastFencePost) {
-      
-      /* case 1: neighbors */
 
-      /* Check if previous block is allocated or unallocated */
+      /* case 1: contiguous with the previous chunk. The two fenceposts
+         between them (2 * ALLOC_HEADER_SIZE) can be reclaimed. */
 
-      header * previousBlock = (header *)((char *)lastFencePost - lastFencePost->left_size);
+      header * previousBlock = get_left_header(lastFencePost);
       if (get_state(previousBlock) == UNALLOCATED) {
+
+        /* extend the previous free block over the fenceposts and new chunk */
+        remove_header(previousBlock);
         set_size(previousBlock,
                  get_size(previousBlock) + (2 * ALLOC_HEADER_SIZE) + get_size(new_chunk));
-        lastFencePost = (header *) ((char *) previousBlock + 
-                 get_size(previousBlock) + (2 * ALLOC_HEADER_SIZE) + get_size(new_chunk));
+        rightFence->left_size = get_size(previousBlock);
+        insert_header(previousBlock, get_free_list_index(get_size(previousBlock)));
         new_chunk = previousBlock;
-        remove_header(new_chunk);
-        int new_free_list_index = get_free_list_index(get_size(new_chunk));
-        insert_header(new_chunk, new_free_list_index);
       }
       else {
-        set_size(lastFencePost,
-                 (2 * ALLOC_HEADER_SIZE + get_size(new_chunk)));
-        set_state(lastFencePost, UNALLOCATED);
+
+        /* previous block is in use: reuse the old fencepost as the header */
+        set_size_and_state(lastFencePost,
+                 2 * ALLOC_HEADER_SIZE + get_size(new_chunk), UNALLOCATED);
+        rightFence->left_size = get_size(lastFencePost);
+        insert_header(lastFencePost, get_free_list_index(get_size(lastFencePost)));
         new_chunk = lastFencePost;
-        lastFencePost = (header *) ((char *) lastFencePost + get_size(new_chunk));
-        int new_free_list_index = get_free_list_index(get_size(new_chunk));
-        insert_header(new_chunk, new_free_list_index);
       }
     }
     else {
 
-      /* case 2: not neighbors: just insert into free_list.  */
- 
+      /* case 2: not contiguous: register a new OS chunk and insert as-is */
+
       header *prevFencePost = get_header_from_offset(new_chunk, -ALLOC_HEADER_SIZE);
       insert_os_chunk(prevFencePost);
-      lastFencePost = (header *) ((char *) new_chunk + get_size(new_chunk));
-      int new_free_list_index = get_free_list_index(get_size(new_chunk));
-      insert_header(new_chunk, new_free_list_index);
+      insert_header(new_chunk, get_free_list_index(get_size(new_chunk)));
     }
+
+    lastFencePost = rightFence;
 
     /* check if new size is big enough for the request: actual_size */
 
@@ -456,94 +448,57 @@ static inline void deallocate_object(void * p) {
 
   /* calculate pointer to header from p */
 
-  header *current = (header *)((char *) p - sizeof(header));
-  if (get_state(current) != ALLOCATED) {
-    current = (header *)((char *) p - (2 * sizeof(size_t)));
-  }
+  header *current = ptr_to_header(p);
 
   /* check double free */
 
   if (get_state(current) == UNALLOCATED) {
     fprintf(stderr, "Double Free Detected\n");
-    #line 577
     assert(false); // Terminate the program as specified
   }
-  size_t current_size = get_size(current);
+
+  /* Mark this block free immediately. Even when it is coalesced into its left
+   * neighbour below (so this header becomes interior), the UNALLOCATED marker
+   * left behind lets a later double free of the same pointer be detected. */
+  set_state(current, UNALLOCATED);
+
   header *right = get_right_header(current);
-  header *left = (header *)((char *)current - current->left_size);
+  header *left  = get_left_header(current);
   int right_unallocated = (get_state(right) == UNALLOCATED);
-  int left_unallocated = (get_state(left) == UNALLOCATED);
+  int left_unallocated  = (get_state(left)  == UNALLOCATED);
 
   if (!right_unallocated && !left_unallocated) {
 
-      // Case 1: Neither neighbor is unallocated
+      // Case 1: Neither neighbor is free. Just free 'current' in place.
 
       set_state(current, UNALLOCATED);
-      int free_list_index = get_free_list_index(get_size(current));
-      insert_header(current, free_list_index);
+      insert_header(current, get_free_list_index(get_size(current)));
   } else if (right_unallocated && !left_unallocated) {
 
-      // Case 2: Only the right block is unallocated
+      // Case 2: Only the right block is free. Absorb it into 'current'.
 
+      remove_header(right);
+      set_size(current, get_size(current) + get_size(right));
       set_state(current, UNALLOCATED);
-      size_t new_size = current_size + get_size(right);
-
-      /* stay in same spot of free list if last list*/
-
-      if (get_free_list_index(get_size(right)) == 58) {
-        set_size(right, new_size);
-        right -> left_size = current -> left_size;
-        set_state(right, UNALLOCATED);
-        header *new_right = get_right_header(right);
-        new_right -> left_size = new_size;
-      }
-      else {
-        remove_header(right);
-        set_state(current, UNALLOCATED);
-        set_size(current, new_size);
-        header *new_right = get_right_header(current);
-        new_right->left_size = new_size;
-        int free_list_index = get_free_list_index(new_size);
-        insert_header(current, free_list_index);
-      }
+      get_right_header(current)->left_size = get_size(current);
+      insert_header(current, get_free_list_index(get_size(current)));
   } else if (!right_unallocated && left_unallocated) {
 
-      // Case 3: Only the left block is unallocated
+      // Case 3: Only the left block is free. Absorb 'current' into it.
 
-      set_state(current, UNALLOCATED);
-      size_t new_size = current_size + get_size(left);
-
-      /* stay in same spot of free list if last list */
-
-      if (get_free_list_index(get_size(left)) == 58) {
-        set_size(left, new_size);
-        set_state(left, UNALLOCATED);
-        header *new_right = get_right_header(left);
-        new_right -> left_size = new_size;
-      }
-      else {
-        remove_header(left);
-        set_state(left, UNALLOCATED);
-        set_size(left, new_size);
-        header *new_right = get_right_header(left);
-        new_right->left_size = new_size;
-        int free_list_index = get_free_list_index(new_size);
-        insert_header(left, free_list_index);
-      }
+      remove_header(left);
+      set_size(left, get_size(left) + get_size(current));
+      get_right_header(left)->left_size = get_size(left);
+      insert_header(left, get_free_list_index(get_size(left)));
   } else {
 
-     // Case 4: Both neighbors are unallocated
+     // Case 4: Both neighbors are free. Merge all three into 'left'.
 
-     set_state(current, UNALLOCATED);
-     size_t new_size = current_size + get_size(right) + get_size(left);
-     remove_header(right);
      remove_header(left);
-     set_state(left, UNALLOCATED);
-     set_size(left, new_size);
-     header *new_right = get_right_header(left);
-     new_right->left_size = new_size;
-     int free_list_index = get_free_list_index(new_size);
-     insert_header(left, free_list_index);
+     remove_header(right);
+     set_size(left, get_size(left) + get_size(current) + get_size(right));
+     get_right_header(left)->left_size = get_size(left);
+     insert_header(left, get_free_list_index(get_size(left)));
   }
 }
 
