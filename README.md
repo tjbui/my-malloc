@@ -18,7 +18,7 @@ gcc -shared -fPIC -o libmymalloc.so src/myMalloc.c -pthread
 
 LD_PRELOAD=./libmymalloc.so /bin/echo hello
 LD_PRELOAD=./libmymalloc.so touch hello.txt
-LD_PRELOAD=./libmymalloc.so w3m google.com
+LD_PRELOAD=./libmymalloc.so w3m example.com
 ```
 
 Preloading makes the target program use this allocator instead of the system
