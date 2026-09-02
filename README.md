@@ -38,3 +38,9 @@ see its heap output.
   block, which is faster than scanning `freelistSentinels[]` directly.
 - **Realloc** — frees the original pointer, allocates a new block, copies the
   data with `memcpy()`, and returns the new pointer.
+
+## Note
+
+This project is not affiliated with or endorsed by Purdue University. The source
+code here is my own, with major changes to the baseline code from the original
+project, which is why it is shared in a public repository.
