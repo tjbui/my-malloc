@@ -8,5 +8,5 @@ tests/testall
 # Local demo binaries
 /simple
 
-# AI assistant guidance (local only)
+# keep local only
 CLAUDE.md
